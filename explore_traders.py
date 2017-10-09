@@ -8,7 +8,6 @@ import pandas
 app = Flask(__name__, static_url_path='/static/')
 print("Loading app", app.name)
 
-
 # @app.teardown_appcontext
 # def close_db(error):
 #     global NETX_DB
@@ -27,7 +26,8 @@ def get_descriptions():
     DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', 
         encoding='utf-16', warn_bad_lines=True)
     print("checking for", code)
-    return utils.get_desc_by_CN(DF_CN, code)['Self-Explanatory text (English)'].values[0]
+    tmp = utils.get_desc_by_CN(DF_CN, code)
+    return tmp['Self-Explanatory text (English)'].values[0]
 
 def dir_edge_count(node, direction):
     global NETX_DB
@@ -98,8 +98,8 @@ def common_goods_traded(Gph, goods_list, direction, exclude=None):
                 (x in Gph[w]) and
                 (x not in (u, v, w)) and
                 (
-                    (Gph.edge[u][x]['direction'] == direction) or
-                    (Gph.edge[v][x]['direction'] == direction) or
+                    (Gph.edge[u][x]['direction'] == direction) and
+                    (Gph.edge[v][x]['direction'] == direction) and
                     (Gph.edge[w][x]['direction'] == direction) 
                 ) and
                 (x != exclude)
@@ -166,7 +166,8 @@ def get_graph():
         focus_co, num_nodes, node_limit))
     global NETX_DB
     global DBS_PATH
-    DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', encoding='utf-16', warn_bad_lines=True)
+    DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', 
+        encoding='utf-16', warn_bad_lines=True)
     nodes = []
     rels = []
     i =0
@@ -215,7 +216,7 @@ def get_graph():
         direction='Exported', exclude=focus_co)]
 
     # Dummy list for finding companies that import OR export these goods
-    # MAY INCLUDE GOODS THAT ARE NOT TRADED BY ANY RELATED COMPANIES
+    # MAY INCLUDE GOODS NOT TRADED BY ANY RELATED COMPANIES IN THAT DIRECTION
     goods_to_show = [serialize_cmdty(n[1], 'Imported') for n in focal_co_goods]
     [goods_to_show.append(serialize_cmdty(n[1], 'Exported')) for n in focal_co_goods]
     for direction in ['Imported', 'Exported']:
@@ -225,53 +226,45 @@ def get_graph():
         else:
             names_list = exporters
         if len(names_list) != 0:  # TODO: handle case when no related companies found
-            node_lim_per_name = int((node_limit - focus_co_goods_limit) / len(names_list))+1
-            for name in names_list:
-                if i < node_limit:
-                    conode = serialize_company(company=name, direction=direction)
-                    try:
-                        source = nodes.index(conode)
-                        # print('\n_', end='')
-                        # print(i, conode['name'], end=' ')
-                    except ValueError:
-                        if i < node_limit:
-                            nodes.append(conode)
-                            source = i
-                            i += 1
-                            # print('\n+', end=' ')
-                            # print(i, conode, end=' ')
-                    for cmdty in _get_top_edges(NETX_DB, name, howmany=node_lim_per_name):
-                        hsnode = serialize_cmdty(good=cmdty[1], direction=direction)
-                        if hsnode in goods_to_show:
-                            # print(hsnode, end=' ')
-                            # check if the commodity is already there
-                            # on the particular import / export side
-                            try:
-                                target = nodes.index(hsnode)
-                            except ValueError:
-                                if i < node_limit:
-                                    nodes.append(hsnode)
-                                    target = i
-                                    i += 1
-                                    # print('+', end=' ')
-                                    # print(i, hsnode['name'], end=' ')
-                        # else:
-                        #     print('-', end='')
-                        rels.append({"target": target, "source": source})
-                        # print('.', end=' ')
-                        # print(hsnode['name'], end=' ')
-    print('\nSending json for background graph with {0} nodes...'.format(str(i)))
+            node_lim_per_name = int(
+                (node_limit - focus_co_goods_limit) 
+                / len(names_list)
+                ) + 10
+        for name in names_list:
+            if i < node_limit:
+                conode = serialize_company(company=name, direction=direction)
+                try:
+                    source = nodes.index(conode)
+                except ValueError:
+                    if i < node_limit:
+                        nodes.append(conode)
+                        source = i
+                        i += 1
+                for cmdty in _get_top_edges(NETX_DB, name, 
+                    howmany=node_lim_per_name):
+                    hsnode = serialize_cmdty(good=cmdty[1], direction=direction)
+                    if hsnode in goods_to_show:
+                        # check if the commodity is already there
+                        # on the particular import / export side
+                        try:
+                            target = nodes.index(hsnode)
+                        except ValueError:
+                            if i < node_limit:
+                                nodes.append(hsnode)
+                                target = i
+                                i += 1
+                    rels.append({"target": target, "source": source})
+    print('Sending json for background graph with {0} nodes...'.format(str(i-1)))
+
     return Response(dumps({"nodes": nodes, "links": rels}),
         mimetype="application/json")
 
 if __name__ == '__main__':
     print('Loading graph to memory...')
     NETX_DB = nx.Graph()
-
-    DBS_PATH = 'C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\'
-    #global DBS_PATH
-
-    NETX_DB = nx.read_gml(DBS_PATH+'impex_small.graphml')
+# DBS_PATH = 'C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\'
+    DBS_PATH = '/Users/ramintakin/Parkway_Drive/Trade_finance/Technology/SIC_HS_tool/'
+    NETX_DB = nx.read_gml(DBS_PATH+'impex_full.graphml')
     print('loaded', NETX_DB.order(), 'nodes and', NETX_DB.size(), 'edges')
     host='127.0.0.1'
     port=8081

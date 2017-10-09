@@ -137,8 +137,13 @@ def get_desc_by_CN(df, CNcode, verbose=False):
 	try:
 		assert (len(str(CNcode))==8) | (len(str(CNcode))==7)
 	except:
-		logging.error('invalid CN code supplied to get_desc_by_CN()')
-		return 0
+		logging.error('invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
+		outdf = pd.DataFrame({
+			'Commodity Code': [CNcode],
+			'Supplementary Unit': ['unk'],
+			'Self-Explanatory text (English)': ['Invalid code']
+			})
+		return outdf
 	if len(str(CNcode))==7: CNcode = '0'+str(CNcode)
 	# df = pd.read_csv('2017_CN.txt', sep='\t', 
 	# 	encoding='utf-16', warn_bad_lines=True)
@@ -154,7 +159,7 @@ def get_desc_by_CN(df, CNcode, verbose=False):
 			'Supplementary Unit': ['unk'],
 			'Self-Explanatory text (English)': ['Code not found']
 			})
-		print('empty df', end=' ')
+		# print('empty df', end=' ')
 		# _print_HS(outdf)
 	else:
 		outdf = _tidyup_df(foundstrings)  # return 8-digit string
