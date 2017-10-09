@@ -23,6 +23,7 @@ def get_index():
 def get_descriptions():
     global DBS_PATH
     code = request.args['cn1']
+    global DBS_PATH
     DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', 
         encoding='utf-16', warn_bad_lines=True)
     print("checking for", code)
@@ -266,8 +267,10 @@ def get_graph():
 if __name__ == '__main__':
     print('Loading graph to memory...')
     NETX_DB = nx.Graph()
-    global DBS_PATH
-    DBS_PATH = '/Users/ramintakin/Parkway_Drive/Trade_finance/Technology/SIC_HS_tool/'
+
+    DBS_PATH = 'C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\'
+    #global DBS_PATH
+
     NETX_DB = nx.read_gml(DBS_PATH+'impex_small.graphml')
     print('loaded', NETX_DB.order(), 'nodes and', NETX_DB.size(), 'edges')
     host='127.0.0.1'
