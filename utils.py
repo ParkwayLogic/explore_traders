@@ -141,16 +141,8 @@ def get_desc_by_CN(df, CNcode, verbose=False):
 	try:
 		assert (len(str(CNcode))==8) | (len(str(CNcode))==7)
 	except:
-<<<<<<< HEAD
-		logging.error('invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
-=======
-<<<<<<< HEAD
 		if shall_log: logging.error(
 			'invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
-=======
-		logging.error('invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
->>>>>>> master
->>>>>>> rtpy-edits
 		outdf = pd.DataFrame({
 			'Commodity Code': [CNcode],
 			'Supplementary Unit': ['unk'],
