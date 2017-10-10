@@ -18,6 +18,94 @@ print("Loading app", app.name)
 def get_index():
     return app.send_static_file('index.html')
 
+@app.route("/HS_tool")
+def get_product_friendly():
+    code = request.args['cn1']
+    global DBS_PATH
+    lookup_table = pandas.read_csv(DBS_PATH+'HS2_names_ref.txt', sep='\t', 
+        dtype={'HS2': str, 'HS2Desc': str}, warn_bad_lines=True)
+    chap = utils._make_8char_CN(code)[:2]
+    rows_bool = (lookup_table['HS2']==chap)
+    desc = lookup_table.loc[rows_bool,'HS2Desc'].values[0]
+    return Response(get_product_totals_from_file(desc), 
+        mimetype="application/json")
+
+def get_product_totals_from_file(desc):
+    """
+    Returns in json format, totals for variables displayed by HS Country tool
+    argument desc is the friendly name for the tariff Section
+    """
+    colnames = [
+        'ProdName', 'Destination', 'Region', 'RegionCount', 'RegionValue',
+        'Status', 'Treaty', 'TreatyCountries', 'TreatyDate', 'TreatyLink',
+        'CSub320k', 'VSub320k', 'C320k1m', 'V320k1m', 'C1m16m', 'V1m16m',
+        'CLarger', 'VLarger', 'CSmalls', 'VSmalls', 'CLarges', 'VLarges',
+        'CIPROPRsub1m', 'CIPROPRLarger', 'Reexsub1m', 'ReexLarger', 'AirLHR',
+        'OtherAir', 'Sea'
+    ]
+    coltypes = [
+        'str', 'str', 'str', 'int', 'int',
+        'str', 'str', 'str', 'str', 'str',
+        'int', 'int', 'int', 'int', 'int', 'int', 
+        'int', 'int', 'int', 'int', 'int', 'int', 
+        'int', 'int', 'int', 'int', 'int', 'int', 'int'
+    ]
+    colnas = [
+        '-', '-', '-', 0, 0,
+        '-', '-', '-', '-', '-', 
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0
+    ]
+    assert len(colnames)==len(coltypes)==len(colnas)
+    coltypesdict = dict(zip(colnames, coltypes))
+    global DBS_PATH
+    hs_lookup_table = pandas.read_csv(
+        DBS_PATH+'HS-country-tool-updated-201708.csv', sep=',', 
+        warn_bad_lines=True) 
+    # keep_default_na=False, na_values=["NA"], na_filter=False, dtype=coltypesdict,
+    hs_lookup_table.fillna(value=dict(zip(colnames, colnas)), inplace=True)
+    rows_bool = (hs_lookup_table['ProdName']==desc)
+    relevant_rows = hs_lookup_table.loc[rows_bool,:]
+    columns_list = [
+        'VSmalls', 'VLarges', 'CSmalls', 'CLarges',
+        'AirLHR', 'OtherAir', 'Sea', 
+        'CIPROPRsub1m', 'CIPROPRLarger', 'Reexsub1m', 'ReexLarger'
+    ]  # 'ContCAll',
+    out_col_headings = [
+        'SumVSmalls', 'SumVLarges', 'SumCSmalls', 'SumCLarges',
+        'SumAirLHR', 'SumOtherAir', 'SumSea', 
+        'SumCIPROPRsub1m', 'SumCIPROPRLarger', 'SumReexCSub1m', 'SumReexLarger'
+    ]  # 'SumContCAll',
+    cols_dict = dict(zip(columns_list, out_col_headings))
+    output_values = {}
+    for col in cols_dict.items():
+        output_values[col[1]] = int(sum(relevant_rows.loc[:,col[0]]))
+    # print(output_values)
+
+    top_countries_list = []
+    for i, n in relevant_rows.iterrows():
+        top_countries_list.append({'Country': n['Destination'], 'Value': int(n['VSmalls'] + n['VLarges'])})
+#     print(top_countries_list)
+    top_countries_list.sort(key=lambda tup: tup['Value'], reverse=True)
+    print(top_countries_list[:10])
+    output_values['top_countries_list'] = top_countries_list[:10]
+
+    output_values['ProdName'] = str(desc)
+    print(output_values)
+
+    # output_values = [int(sum(relevant_rows.loc[:,col])) for col in columns_list]
+
+    # out_col_headings.append('Top countries')
+    # top_countries_list = [n for n in relevant_rows['Destination']]
+    # output_values.append(top_countries_list)
+
+    # out_col_headings.append('ProdName')
+    # output_values.append(str(desc))
+    # print('giving results for', desc)
+    # [print(a, b) for a, b in zip(out_col_headings, output_values)]
+    return dumps(output_values)
+
 @app.route("/descriptions")
 def get_descriptions():
     global DBS_PATH
@@ -26,8 +114,9 @@ def get_descriptions():
     DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', 
         encoding='utf-16', warn_bad_lines=True)
     print("checking for", code)
-    tmp = utils.get_desc_by_CN(DF_CN, code)
-    return tmp['Self-Explanatory text (English)'].values[0]
+    tmp = utils.get_desc_by_CN(DF_CN, code
+        )['Self-Explanatory text (English)'].values[0]
+    return Response(dumps({"description": tmp}), mimetype="application/json")
 
 def dir_edge_count(node, direction):
     global NETX_DB
@@ -48,7 +137,8 @@ def serialize_company(company, direction='focal'):
     'size': x,
     'size_metric': 'HS code diversity',
     'name': company,
-    'postcode': 'AB12 CDE'
+    'postcode': 'AB12 CDE',
+    'rank': 0
     }
 
 def serialize_cmdty(good, direction):
@@ -57,7 +147,8 @@ def serialize_cmdty(good, direction):
     'direction': direction,
     'size': len(NETX_DB[good]), #dir_edge_count(good, direction), too slow
     'size_metric': '# of companies that traded this', #({} this)'.format(direction),
-    'name': good
+    'name': good,
+    'rank': 0
     }
 
 def common_goods_traded(Gph, goods_list, direction, exclude=None):
@@ -254,8 +345,11 @@ def get_graph():
                                 target = i
                                 i += 1
                     rels.append({"target": target, "source": source})
-    print('Sending json for background graph with {0} nodes...'.format(str(i-1)))
+    # Add node rank by size
+    for r, node in enumerate(sorted(nodes, key=lambda d: int(d['size']), reverse=True)):
+        node['rank'] = r
 
+    print('Sending json for background graph with {0} nodes...'.format(str(i-1)))
     return Response(dumps({"nodes": nodes, "links": rels}),
         mimetype="application/json")
 
@@ -264,7 +358,7 @@ if __name__ == '__main__':
     NETX_DB = nx.Graph()
 # DBS_PATH = 'C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\'
     DBS_PATH = '/Users/ramintakin/Parkway_Drive/Trade_finance/Technology/SIC_HS_tool/'
-    NETX_DB = nx.read_gml(DBS_PATH+'impex_full.graphml')
+    NETX_DB = nx.read_gml(DBS_PATH+'impex_small.graphml')
     print('loaded', NETX_DB.order(), 'nodes and', NETX_DB.size(), 'edges')
     host='127.0.0.1'
     port=8081
