@@ -23,6 +23,21 @@ body {
 
 font-size:12px;
 }
+
+	div#tooltip {
+		  position: absolute;        
+			display: inline-block;
+			padding: 10px;
+			font-family: 'Open Sans' sans-serif;
+			color: #000;
+		  background-color: #fff;
+			border: 1px solid #999;
+			border-radius: 2px;
+		  pointer-events: none;
+			opacity: 0;
+			z-index: 1;
+		}
+
 </style>
 
 <body>
@@ -42,7 +57,6 @@ font-size:12px;
 						<option value="SIM FREE LTD">SIM FREE LTD</option>
 						<option value="BAKER HUGHES LTD">BAKER HUGHES LTD</option>
 						<option value="WEATHERFORD UK LTD">WEATHERFORD UK LTD</option>
-
 					</select> 
 				</div>
 					
@@ -50,7 +64,7 @@ font-size:12px;
 								
 					<button id="search" class="btn btn-default btn-xs">Search</button>
 					<button id="split" class="btn btn-default btn-xs">Split</button>
-					<button id="unite" class="btn btn-default btn-xs">Unite</button>
+					<button id="reset" class="btn btn-default btn-xs">Reset</button>
 
 				</div>
 			
@@ -81,15 +95,14 @@ font-size:12px;
 	<div id="container"></div>
 
 	<div id="container"></div>
+	<div id="tooltip">hello</div>
 
 		<div  style="background:#ccc; "  class="row">
 			
-			
 			<div class="col-sm-1 col-md-1"><b>Commodity code</b></div>
 			<div class="col-sm-2 col-md-2">
-			  
-			<span id="cn_code">Explore]</span>
-							
+				<span id="cn_code">Explore</span>
+
 			</div>
 			
 			<div class="col-sm-1 col-md-1"><b>Description</b></div>
@@ -99,6 +112,41 @@ font-size:12px;
 
 			</div>
 		</div>
+
+		<div  style="background:#dee; "  class="row">
+
+			<div class="col-sm-2 col-md-2"><b>Export summary Jul '16 to Apr '17</b>
+				<h3><span id="goods_section"></span></h3></div>
+			<div class="col-sm-4 col-md-4">
+				<table id="export_summary" class="table table-striped table-hover">
+	                <thead>
+	                <tr>
+	                    <th>Item</th>
+	                    <th>Value (&pound;)</th>
+	                </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+				<!-- <span id="export_summary">
+				</span> -->
+			</div>
+			<div class="col-sm-4 col-md-4">
+				<table id="top_countries" class="table table-striped table-hover">
+	                <thead>
+	                <tr>
+	                    <th>Country</th>
+	                    <th>Value (&pound;)</th>
+	                </tr>
+	                </thead>
+	                <tbody>
+	                </tbody>
+	            </table>
+				<!-- <span id="export_summary">
+				</span> -->
+			</div>
+		</div>
+
 	</div>
 
 
@@ -159,14 +207,24 @@ d3.select('button#split').on('mousedown', function(d) {
 		
 	simulation.alpha(0.5);
 
+	nodes[0].x = 0;
+	nodes[0].y = 0;
+	
 	simulation.restart();
 
 }); // button listener/handler
 
-d3.select('button#unite').on('mousedown', function(d) {
+d3.select('button#reset').on('mousedown', function(d) {
 
-	simulation.stop();
+	draw();
+	
+	/* simulation.stop();
 
+	nodes = [];
+	links = [];
+	force.nodes(nodes);
+	force.links(links);
+	
 	simulation
 	 .force("charge", d3.forceManyBody().strength(-30))
 	    .force("link", d3.forceLink(links).distance(40).strength(1))
@@ -175,7 +233,7 @@ d3.select('button#unite').on('mousedown', function(d) {
 		
 	simulation.alpha(0.5);
 
-	simulation.restart();
+	simulation.restart(); */
 
 }); // button listener/handler
 
@@ -239,7 +297,34 @@ d3.select('button#unite').on('mousedown', function(d) {
     	 $.get(searchstring, function(data, status){$("#goods_descriptions").text(data)});
     	 
     	 $("#cn_code").text(d.name);
-    	 
+
+    	 var searchstring2 = "/HS_tool?cn1=" + d.name;
+
+    	 $.get(searchstring2, function(data, status, xhr){
+
+    	 	if (!data || data.length == 0) return;
+    	 	
+    	 	var t1 = $("table#export_summary tbody").empty();
+    	 	var t2 = $("table#top_countries tbody").empty();
+    	 	
+    	 	for (n in data) {
+    	 		if (n == 'ProdName') {
+    	 			$("#goods_section").text(data[n])
+    	 		} else if (n == 'top_countries_list') {
+    	 			// console.log('got here')
+    	 			for (p in data[n]) {
+    	 				$("<tr><td>" + data[n][p]['Country'] + "</td><td>" + 
+    	 					data[n][p]['Value'] + "</td></tr>").appendTo(t2)
+    	 			}
+    	 		} else {
+    	 			$("<tr><td>" + n + "</td><td>" + data[n] + "</td></tr>").appendTo(t1)
+    	 		// parseInt(data[n]).toLocaleString('en-UK', {maximumSignificantDigits: 6})
+    	 		}
+    	 	};
+
+    	 }, "json");
+    	 return false;
+
      }
      
      
@@ -264,7 +349,7 @@ function draw() {
 	 simulation = d3.forceSimulation(nodes)
 	 
 	// .alpha(0.5)
-	    .force("charge", d3.forceManyBody().strength(-30))
+	    .force("charge", d3.forceManyBody().strength(-50))
 	    .force("link", d3.forceLink(links).distance(20).strength(1))
 	    .force("x", d3.forceX())
 	    .force("y", d3.forceY())
@@ -284,11 +369,12 @@ function draw() {
 	    .call(d3.drag()
 	        .container(canvas)
 	        .subject(dragsubject)
-	       // .on("mouseover",tooltip)
 	        .on("start", dragstarted)
 	        .on("drag", dragged)
 	        .on("end", dragended));
 	 
+	
+	d3.select(canvas).on("mousemove",tooltip);
 	
 //	  brush.call(d3.brush()
 	//	        .extent([[0, 0], [width, height]])
@@ -299,6 +385,7 @@ function draw() {
 	
     function zoomed(d) {
 		  trans = d3.event.transform; //<-- set to current transform
+		// context.translate(-trans.x, -trans.y)
 		  ticked(); //<-- use tick to redraw regardless of event
 		}
 	    
@@ -353,6 +440,7 @@ function draw() {
 }
 
 
+var start_x, start_y
 
 function dragsubject() {
   return simulation.find(trans.invertX(d3.event.x - width/2), trans.invertY(d3.event.y-height/2), 10);
@@ -360,16 +448,21 @@ function dragsubject() {
 
 function dragstarted() {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  
+  start_x = d3.event.subject.x;
+  start_y = d3.event.subject.y;
+  
   d3.event.subject.fx = d3.event.subject.x;
   d3.event.subject.fy = d3.event.subject.y;
-  
   console.log("start x = " + d3.event.subject.x)
+  console.log("start y = " + d3.event.subject.y)
 }
 
 function dragged() {
-  d3.event.subject.fx = trans.invertX(d3.event.x);
-  d3.event.subject.fy = trans.invertY(d3.event.y);
-  console.log("start x = " + d3.event.subject.x)
+	
+  d3.event.subject.fx = start_x + (d3.event.x - start_x)/trans.k;
+  d3.event.subject.fy = start_y + (d3.event.y - start_y)/trans.k;
+  //console.log("start x = " + trans.k)
 
   
 }
@@ -384,6 +477,81 @@ function dragended() {
 function drawLink(d) {
   context.moveTo(d.source.x, d.source.y);
   context.lineTo(d.target.x, d.target.y);
+}
+
+
+
+
+function tooltip() {
+
+	const a = this.parentNode;
+    const m = d3.mouse(this);
+       
+    
+    //console.log("x=" + m[0] +"y=" + m[1]);
+    //
+   // console.log("x=" + trans.invertX(m[0]) +"y=" + trans.invertY(m[1]));
+
+    
+    const d = simulation.find(
+    	      trans.invertX(m[0] - width / 2),
+    	      trans.invertY(m[1] - height / 2),
+    	      10);
+	
+	
+if (d) {
+
+	// Show the tooltip only when there is nodeData found by the mouse
+
+	var tooltip_html;
+
+	if (d.type =="hscode") {
+		
+	var searchstring = "/descriptions?cn1=" + d.name;	
+		
+ // 	$.get(searchstring, function(data, status){
+ // 		tooltip_html = data;
+ // 	});
+ 
+	 $.ajax({
+         async: false,
+         type: "GET",
+         url: searchstring,
+         //data: '{name: "Mudassar" }',
+         //contentType: "application/json; charset=utf-8",
+         dataType: "json",
+         success: function (data) {
+        	 tooltip_html = data.description;
+         }
+     });
+ 
+
+	}
+	else {
+		
+		tooltip_html = d.name;
+		
+	}
+ 
+  	
+	d3.select('#tooltip')
+		.style('opacity', 0.8)
+		.style('top', d3.event.pageY + 5 + 'px')
+		.style('left', d3.event.pageX + 5 + 'px')
+		.html(tooltip_html);
+	
+	
+	
+
+} else {
+
+	// Hide the tooltip when there our mouse doesn't find nodeData
+
+	d3.select('#tooltip')
+		.style('opacity', 0);
+
+} 
+
 }
 
 function drawNode(d) {
@@ -406,9 +574,11 @@ function drawNode(d) {
 		
 		context.fillStyle = "#333";
 		
-		var pos_str = d.x + "," + d.y;
+		var pos_str = Math.round(d.x) + "," + Math.round(d.y);
 		
-		context.fillText(d.name,d.x+1.1*r,d.y-1.1*r);
+		
+		// TODO: rank number filter
+		context.fillText(pos_str,d.x+1.1*r,d.y-1.1*r);
 
 		
 	}		

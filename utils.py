@@ -10,8 +10,9 @@ import encodings, nltk
 import os
 from collections import defaultdict
 
-
-logging.basicConfig(filename="utils_logfile.log", level=logging.INFO)
+shall_log = False
+if shall_log: logging.basicConfig(
+	filename="utils_logfile.log", level=logging.INFO)
 # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 
@@ -41,14 +42,15 @@ def suggest_encodings(char_error_code, char_to_find=None):
 
 
 deft_CNlist = [84118280, 84119900, 94033019, 94034090, 82121090, 84191100, 
-1022949, 1061900, 3023519, 48025890, 48026115, 48026180, 48041190, 63014090, 63022290,
-70131000, 70132210]
+1022949, 1061900, 3023519, 48025890, 48026115, 48026180, 48041190, 63014090, 
+63022290, 70131000, 70132210]
 
 def wordcloud(CNlist=deft_CNlist, howmany=20):
 	"""Returns lowercase wordcloud for commodities"""
 	wcloud = defaultdict(int)
-	stopwords = ['of', 'and', 'in', 'with', '.', '=', '<', '>', 'a', 'the', 'for', 'or', 
-	'(', ')', ',', 'but', 'any', 'by', "''", '``', 'which', '%', 'consists']
+	stopwords = ['of', 'and', 'in', 'with', '.', '=', '<', '>', 'a', 'the', 
+	'for', 'or', '(', ')', ',', 'but', 'any', 'by', "''", '``', 'which', '%', 
+	'consists']
 	stopwords = stopwords + ['excl', 'total', 'n.e.s', 'other', 'purposes', 'like']
 	for c in CNlist:
 		desc = get_desc_by_CN(str(c))['Self-Explanatory text (English)'].values
@@ -103,12 +105,13 @@ def get_CN_by_text(searchstring, verbose=False):
 	try:
 		assert searchstring.isalnum()
 	except:
-		logging.error('invalid search string in get_CN_list()')
+		if shall_log: logging.error('invalid search string in get_CN_list()')
 		return 0
 	df = pd.read_csv('C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\2017_CN.txt', sep='\t', 
 		encoding='utf-16', warn_bad_lines=True)
 	searchstring = str(searchstring).lower()
-	if verbose: logging.info('Searching for {0}'.format(searchstring))
+	if verbose and shall_log: logging.info(
+		'Searching for {0}'.format(searchstring))
 	foundstrings = df.loc[df.loc[:,'Self-Explanatory text (English)'
 			].str.lower().str.contains(searchstring),:]
 	outdf = _tidyup_df(foundstrings)  # return 8-digit string
@@ -120,7 +123,8 @@ def get_desc_by_HSchapter(chapternum, verbose=False):
 	try:
 		assert len(str(chapternum))<=2
 	except:
-		logging.error('invalid HS chapter supplied to get_desc_by_HSchapter()')
+		if shall_log: logging.error(
+			'invalid HS chapter supplied to get_desc_by_HSchapter()')
 		return 0
 	if len(str(chapternum))==1: chapternum = '0'+str(chapternum)
 	df = pd.read_csv('2017_CN.txt', sep='\t', 
@@ -137,7 +141,16 @@ def get_desc_by_CN(df, CNcode, verbose=False):
 	try:
 		assert (len(str(CNcode))==8) | (len(str(CNcode))==7)
 	except:
+<<<<<<< HEAD
 		logging.error('invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
+=======
+<<<<<<< HEAD
+		if shall_log: logging.error(
+			'invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
+=======
+		logging.error('invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
+>>>>>>> master
+>>>>>>> rtpy-edits
 		outdf = pd.DataFrame({
 			'Commodity Code': [CNcode],
 			'Supplementary Unit': ['unk'],
