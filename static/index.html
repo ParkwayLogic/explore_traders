@@ -16,17 +16,28 @@
 
 <style>
 #container {
-	
+	position:relative;
 	width: 100%;
 	height: 50%;
 	border: 1px dotted #CCC;
 }
 
+canvas {
+position: absolute;
+left:0;
+ top: 0;
+}
 
 .input{
 
 padding:5px;
-width: 80%;
+width: 95%;
+
+}
+
+html {
+
+	overflow-y: scroll;
 
 }
 
@@ -42,8 +53,7 @@ body {
 
 .btn {
 
-	margin:5px;
-
+	
 }
 
 .ui-widget {
@@ -57,9 +67,18 @@ body {
 
 	font-family: 'Open Sans', sans-serif;
 	font-size: 13px;
-	border-radius: none;
+	    
+	    border-top-right-radius:0;
+	            border-top-left-radius:0;
+	            border-bottom-left-radius:0;
+	            border-bottom-right-radius:0;
+	margin-bottom:3px;
 	
 
+}
+
+.ui-widget select{
+margin-bottom:3px;
 }
 
 .ui-widget button{
@@ -70,17 +89,27 @@ body {
 }
 
 
+#trade-stats-placeholder {
+
+padding:35px;
+height: 30%;
+width: 100%;
+
+
+}
+
 .trade-stats-explain {
 	padding:10px;
-	float:left;
 	font-size:10px;
-	bottom:0;
-	position:absolute;
+	
+	width:100%;
+	
 
 }
 
 .title{
 
+	position: absolute;
 	font-size:18px;
 	font-weight:700;
 	padding-top:10px;
@@ -88,29 +117,41 @@ body {
 }
 
 .legend {
+	position: absolute;
 	padding:10px;
-	float:right;
+	float:left;
 	font-size:10px;
+	
+	bottom:0;
+}
+
+.legend p {
+	margin:0px;
 }
 
 
 .controls {
 
     position: absolute;
-    right: 0px;
-    top: 30px;
+    right:0;
     width: 150px;
     padding: 10px;
+    margin-right:10px;
     font-size: 10px;
-
-
 }
 
+.controls div {
+
+	padding-top:5px;
+}
+    
 div#tooltip {
 	position: absolute;
 	display: inline-block;
 	padding: 2px;
 	font-family: 'Open Sans' sans-serif;
+	font-size:10px;
+	max-width: 450px;
 	color: #000;
 	background-color: #fff;
 	border: 1px solid #999;
@@ -119,6 +160,18 @@ div#tooltip {
 	opacity: 0;
 	z-index: 1;
 }
+
+.beta {
+
+	color:white;
+	background:teal;
+	font-size:14px;
+	font-weight:bold;
+	padding: 3px;
+
+}
+
+
 </style>
 
 <script>
@@ -138,6 +191,7 @@ function number_format(x) {
 			<div class="col-sm-12 col-md-12">
 				<h2>
 					<b>International trade graph explorer</b>
+					<span class="beta">BETA</span>
 				</h2>
 
 			</div>
@@ -151,11 +205,9 @@ function number_format(x) {
 					Search for a trader
 					</div>
 					<input class="input" id="query" name="query">
-					<button id="search" class="btn btn-primary btn-sm">Show</button>
 					
-					<input id="n" name="n" value="2" type="hidden">
-					<input id="lim" name="lim" value="100" type="hidden">
-					<input id="q" name="q" type="hidden">
+					
+				
 	
 				</div>
 			</div>
@@ -163,24 +215,28 @@ function number_format(x) {
 			
 			
 			<div class="col-sm-4 col-md-5">
-				<div>Example trader 
+			<div class="ui-widget">
+				<div>...or pick from an example
 				</div>
 				<select class="input" id="example_company" name="example_company">
-					<option selected="selected" value="KOTTKE LTD">KOTTKE LTD</option>
+					<option disabled selected="selected">Please select</option>
+					<option value="KOTTKE LTD">KOTTKE LTD</option>
 					<option value="ALEXANDER MILLS">ALEXANDER MILLS</option>
-					<option value="SIM FREE LTD">SIM FREE LTD</option>
+					<option value="COSTCO WHOLESALE UK LIMITED">COSTCO WHOLESALE UK LIMITED</option>
 					<option value="BAKER HUGHES LTD">BAKER HUGHES LTD</option>
 				</select>
-				<button id="go" class="btn btn-primary btn-sm">Display</button>
-
+			
+				</div>
 			</div>
 
 
 			<div class="col-sm-2 col-md-2">
-
-				<button id="split" class="btn btn-warning btn-sm">Centre</button>
-				<button id="reset" class="btn btn-success btn-sm">Refresh</button>
-
+				<div>Layout
+				</div>
+				<div>
+				<button id="split" style="width:60px" class="btn btn-warning btn-sm">ALIGN</button>
+				<button id="reset" style="width:60px" class="btn btn-success btn-sm">RESET</button>
+				</div>
 			</div>
 
 		</div>
@@ -191,20 +247,19 @@ function number_format(x) {
 	<div class="row">
 
 		<div class="col-md-12" id="container">
+		<canvas id="canvas"></canvas>
 		<div id="title" class="title"></div>
 		<div id="legend" class="legend">
 
+			<p><i style="color: purple" class="fa fa-circle" aria-hidden="true"></i> Focus trader</p>
+			<p> <i style="color: blue" class="fa fa-circle" aria-hidden="true"></i> Goods exported by them
+			<i style="color: green" class="fa fa-circle" aria-hidden="true"></i> companies who also trade these goods </p>
+			<p><i style="color: red" class="fa fa-circle"	aria-hidden="true"></i> Goods imported by them 
+			<i style="color: yellow" class="fa fa-circle" aria-hidden="true"></i> companies who also trade these goods </p>
+			   
+									
 			
-			<i style="color: purple" class="fa fa-circle"
-				aria-hidden="true"></i> Focus company
-				<i style="color: red" class="fa fa-circle"
-				aria-hidden="true"></i> Import good
-				<i style="color: blue" class="fa fa-circle"
-				aria-hidden="true"></i> Export good
-				<i style="color: yellow" class="fa fa-circle"
-				aria-hidden="true"></i> Importer
-				<i style="color: green" class="fa fa-circle"
-				aria-hidden="true"></i> Exporter
+			
 			
 			</div>
 			
@@ -242,12 +297,10 @@ function number_format(x) {
 			</div>	
 			
 			
-		<div class="trade-stats-explain">Explore goods by clicking on a blue import good <i style="color: blue" class="fa fa-circle" aria-hidden="true"></i> or
-				red import good node <i style="color: red" class="fa fa-circle" aria-hidden="true"></i> to reveal export trading below.
-		</div>	
+		
 		</div>
 
-		<div id="tooltip">hello</div>
+		<div id="tooltip"></div>
 		
 		
 
@@ -256,26 +309,37 @@ function number_format(x) {
 		
 
 		</div>
+
+
+<div id="trade-stats-placeholder">
+
 	
+	<h4 style="color:#999999" class="text-center">Reveal trade statistics by clicking on nodes</h4>
 
-<div id="trade-stats-placeholder"></div>
+	<div class="text-center trade-stats-explain">Exported goods are <i style="color: blue" class="fa fa-circle" aria-hidden="true"></i> circles and 
+imported goods are <i style="color: red" class="fa fa-circle" aria-hidden="true"></i> circles. 
+</div>	
+</div>
 
-<div id="trade-stats" style="display:none">
+<span style="display:none" id="waiting">Please wait ...</span>
+
+<div id="trade-stats-exports" style="display:none">
+
+	<div class="row">
+		<div class="col-md-12">
+			<b>Keywords describing the traded goods: </b>
+			<em><span id="CN_words"></span></em>
+		</div>
+	</div>
 	<div class="row">
 
 		<div class="col-md-12">
 			
-			<h3><b>Trade statistics</b></h3>
+			<h3 class="text-center"><b>Export statistics</b></h3>
 		
-			<p>Sales within the <span id="cn_code"></span> commodity code (<span id="ProdName"></span>) from the UK to all destinations across the world from Jul 2016 to Apr 2017 accounted for 
-			&pound;<span id="SumV"></span>,
-			which were carried out in 
-			<span id="SumC"> </span> shipments.</p>
-
-			<p>Trades that were worth less than &pound;1 million accounted for 
-			&pound;<span id="PercentVSmall"> </span> million of this total, carried out in 
-			<span id="SumCSmalls"></span> shipments.
-			</p>
+			<p style="font-size:110%; margin-top:20px; margin-bottom:20px">The UK exported &pound;<span id="SumV"></span> under commodity code <span id="cn_code"></span> - <span id="ProdName"></span>.</p>
+			<p style="font-size:110%; margin-bottom:30px">These sales to non-EU destinations across the world were carried out in <span id="SumC"> </span> shipments from Jul 2016 to Apr 2017.
+			Trades that were worth less than &pound;1 million accounted for &pound;<span id="PercentVSmall"> </span> of this total, carried out in <span id="SumCSmalls"></span> shipments. </p>
 		</div>
 	</div>
 
@@ -285,13 +349,13 @@ function number_format(x) {
 		<div class="col-md-6 col-sm-6">
 				
 			<table class="table table-striped table-condensed">
-	         
+	          <thead>
 	         <tr><td colspan=2><b>Details</b></td></tr>
-			
-			<tr><td>Value of large exports (&gt; 1m)</td><td><span id="SumVLarges"></span></td></tr>
-			<tr><td>Value of smaller exports (&lt; 320k)</td><td><span id="SumVSmalls"></span></td></tr>
+			</thead>
+			<tr><td>Value of large exports (&gt; &pound; 320k)</td><td>&pound;<span id="SumVLarges"></span></td></tr>
+			<tr><td>Value of smaller exports (&lt; &pound; 320k)</td><td>&pound;<span id="SumVSmalls"></span></td></tr>
 			<tr><td>No of large exports</td><td><span id="SumCLarges"></span></td></tr>
-			<tr><td>No of small exports</td><td><span id="SumCSmalls"></span></td></tr>
+			<tr><td>No of small exports</td><td><span id="SumCSmalls2"></span></td></tr>
 		
 
 			<tr><td colspan=2><b>Shipping details</b></td></tr>
@@ -300,16 +364,13 @@ function number_format(x) {
 			<tr><td>Number by other airports</td><td><span id="SumOtherAir"></span></td></tr>
 			
 			<tr><td colspan=2><b>Customs</b></td></tr>
-			<tr><td>For re-export &lt; &pound;1m</td><td><span id="SumReexCSub1m"></span></td></tr>
-			<tr><td>For re-export &gt; &pound;1m</td><td><span id="SumReexLarger"></span></td></tr>
-			<tr><td>Inward/outward process relief &gt; &pound;1m</td><td><span id="SumCIPROPRLarger"></span></td></tr>
-			<tr><td>Not using </td><td><span id="SumCIPROPRsub1m"></span></td></tr>
-			
-			
-
+			<tr><td>For re-export (&lt; &pound;320k)</td><td><span id="SumReexCSub1m"></span></td></tr>
+			<tr><td>For re-export (&gt; &pound;320k)</td><td><span id="SumReexLarger"></span></td></tr>
+			<tr><td>Inward/outward processing relief &gt; &pound;1m</td><td><span id="SumCIPROPRLarger"></span></td></tr>
+			<tr><td>Not using processing relief </td><td><span id="SumCIPROPRsub1m"></span></td></tr>
+		  
 	                    
-	                    
-	          
+	      
 	       
 	            </table>
 				
@@ -319,7 +380,7 @@ function number_format(x) {
 	                <thead>
 	                <tr>
 	                    <td><b>Country</b></td>
-	                    <td><b>Value (&pound;m)</b></td>
+	                    <td><b>Value (&pound;)</b></td>
 	                </tr>
 	                </thead>
 	                
@@ -331,15 +392,67 @@ function number_format(x) {
 		</div>
 
 	</div>
+	
+	<div id="trade-stats-imports" style="display:none">
+
+	<div class="row">
+
+	
+
+		<div class="col-md-12">
+			
+			<h3 class="text-center"><b>Import statistics</b></h3>
+			
+			<h4 class="text-center" style="margin-top: 20px; margin-bottom:20px">Import statistics not available</h4> 
+								
+			
+		</div>
+	</div>
+</div>
+	
+		<div class="row">
+
+	
+
+		<div class="col-md-12">
+	
+	<p class="text-center">Detailed trade analysis and information is provided through our software at Exabler.com. Customers receive close support 
+			and leading edge technology to carry out various trading activities, from buyer and seller due diligence, pricing, financing to formalities.</p>
+			
+			<p class="text-center" style="margin-top: 30px; margin-bottom:20px"><b>For more information about our products and services, please contact us on 0207 112 8905 or info@exabler.com</b></p>
+	
+	</div>
+	</div>
+	
 </div>
 
-</div>
+
+
+
 
 	<script>
 
 	
 var width = $('#container').width(), height=$('#container').height();
-var canvas = d3.select('#container').append('canvas').attr('width', width).attr('height', height);
+var canvas = d3.select('#canvas').attr('width', width).attr('height', height);
+
+
+var nodes, 
+	links,
+	context,
+	canvas, 
+	simulation,
+	label_detail,
+	num_nodes,
+	nodes_limit,
+	focus_company;
+
+label_detail = 10;
+		
+var trans = d3.zoomIdentity; //<-- identity
+
+var temp_pan_x, temp_pan_y;
+
 
 $(function() {
 	
@@ -366,7 +479,6 @@ $(function() {
 						};
 					}));
 					
-					
 				
 				}
 			});
@@ -376,7 +488,35 @@ $(function() {
 			
 	//		$("#regnum").val(ui.item.regnum);
 		//	$("#company_name").val(ui.item.label);
-			$("#q").val( encodeURIComponent(ui.item.names));
+			//$("#q").val( encodeURIComponent(ui.item.names));
+			
+			 
+			focus_company=ui.item.label;
+			var query2=$("#num_nodes").val();
+			var query3=$("#node_limit").val();
+				  		
+				
+				d3.json("/graph?q=" + focus_company + 
+						"&n=" + encodeURIComponent(query2) +
+						"&lim=" + encodeURIComponent(query3) , function(error, json) {
+				  if (error) throw error;
+				       		  
+				  	graph = json;
+				  
+					nodes = graph.nodes;
+			   		links = graph.links;
+				
+			   		   		
+			   		draw(nodes, links);
+			   		$("#CN_words").text(graph.words)
+				});
+				
+
+				$('#title').text(focus_company);
+				$('#example_company').val("Please select");
+				
+			
+			
 			
 		},
 		open : function() {
@@ -389,55 +529,57 @@ $(function() {
 });
 
 
-$("#search").click( function() {
-	 
-	var query=$("#query").val();
-	var query2=$("#n").val();
-	var query3=$("#lim").val();
-		  
-		d3.json("/graph?q=" + encodeURIComponent(query) + 
-				"&n=" + encodeURIComponent(query2) +
-				"&lim=" + encodeURIComponent(query3) , function(error, json) {
-		  if (error) throw error;
-		       		  
-		  	graph = json;
-		  
-			nodes = graph.nodes;
-	   		links = graph.links;
-		
-	   		   		
-	   		draw();
-		});
-		
-		$('#title').text(query);
-		
-	    }
-);	
+$("#num_nodes").change( function() {
+	
+	refresh();
+	
+});
 
-$("#go").click( function() {
-		 
-	var query=$("#example_company").val();
-		  var query2=$("#num_nodes").val();
-		  var query3=$("#node_limit").val();
-		  
-		d3.json("/graph?q=" + encodeURIComponent(query) + 
-				"&n=" + encodeURIComponent(query2) +
-				"&lim=" + encodeURIComponent(query3) , function(error, json) {
-		  if (error) throw error;
-		       		  
-		  	graph = json;
-		  
-			nodes = graph.nodes;
-	   		links = graph.links;
+
+function refresh() {
+	
+	node_limit=$("#node_limit").val();
+	num_nodes=$("#num_nodes").val();
+	  
+	d3.json("/graph?q=" + encodeURIComponent(focus_company) + 
+			"&n=" + encodeURIComponent(num_nodes) +
+			"&lim=" + encodeURIComponent(node_limit) , function(error, json) {
+	  if (error) throw error;
+	       		  
+	  	graph = json;
+	  
+		nodes = graph.nodes;
+ 		links = graph.links;
+ 		
+ 		draw(nodes, links);
+		$("#CN_words").text(graph.words)
+ 		
+	});
+	
+}
+
+$("#node_limit").change( function() {
+	
+	
+	refresh();
+	
+});
+
+
+
+d3.select("#example_company").on('change', function() {
+	
+	focus_company=$("#example_company").val();
+	
+	node_limit=$("#node_limit").val();
+	num_nodes=$("#num_nodes").val();
+	  	
+	refresh();
+	
+	$('#title').text(focus_company);
+	$('#query').val("");
 		
-	   		   		
-	   		draw();
-		});
-		
-		$('#title').text(query);
-		
-	    }
-);	
+});	
 
 
 var fixed_layout;
@@ -452,7 +594,7 @@ d3.select('button#split').on('mousedown', function(d) {
 		.force('charge', d3.forceManyBody().strength(
 				function(d) { 
 				
-					return d.type === "company" ? -250 : 0; 
+					return d.type === "company" ? -100 : -50; 
 					
 				} 		
 		
@@ -469,7 +611,7 @@ d3.select('button#split').on('mousedown', function(d) {
 			
 		}));
 		
-	simulation.alpha(0.5);
+	simulation.alpha(0.3);
 
 	
 	
@@ -477,28 +619,12 @@ d3.select('button#split').on('mousedown', function(d) {
 
 }); // button listener/handler
 
-d3.select('button#reset').on('mousedown', function(d) {
+///d3.select('button#reset').on('mousedown', function(d) {
 
-	draw();
-	
-	/* simulation.stop();
+//	fixed_layout = false;
+//	draw(nodes, links);
 
-	nodes = [];
-	links = [];
-	force.nodes(nodes);
-	force.links(links);
-	
-	simulation
-	 .force("charge", d3.forceManyBody().strength(-30))
-	    .force("link", d3.forceLink(links).distance(40).strength(1))
-	    .force("x", d3.forceX())
-	    .force("y", d3.forceY());
-		
-	simulation.alpha(0.5);
-
-	simulation.restart(); */
-
-}); // button listener/handler
+//}); 
 
 
 
@@ -530,6 +656,9 @@ d3.select('button#reset').on('mousedown', function(d) {
         context.clearRect(0, 0, canvas.width, canvas.height);
          
         var query = d.name;
+        
+        focus_company=d.name;
+        
         var query2=$("#num_nodes").val();
         var query3=$("#node_limit").val();	
 		
@@ -542,88 +671,117 @@ d3.select('button#reset').on('mousedown', function(d) {
 		  if (error) throw error;
    			
    		
-   			
+  
    			if (error) throw error;
    			  graph = json;
    			  
    			  nodes = graph.nodes;
    			  links = graph.links;
    			  
-   			  draw();
+   			  draw(nodes,links);
+   			  $("#CN_words").text(graph.words)
    		
    		});
+        
+        $('#example_company').val("Please select");
+        $('#query').val("");
      }
      
      else if (d.type =="hscode" && d.direction == "Exported") { 
     	 
     	 var searchstring = "/descriptions?cn1=" + d.name;
-    	 
-    	 $.get(searchstring, function(data, status){$("#goods_descriptions").text(data.description)});
-    	 
+
+    	 $("#trade-stats-placeholder").hide();
+    	 $("#trade-stats-imports").hide();
     	 $("#cn_code").text(d.name);
+
+    //	 $.get(searchstring, function(data, status){$("#goods_descriptions").text(data.description)});
+    	 
+    	 $("#waiting").show();
     	 
     	 var searchstring2 = "/HS_tool?cn1=" + d.name;
-		
-    
-       	 $.get(searchstring2, function(data, status, xhr){
+    	 
+    	 $.ajax({
+             async: false,
+             type: "GET",
+             url: searchstring2,
+             dataType: "json",
+             beforeSend : function() { 
 
-     	 	if (!data || data.length == 0) return;
-     	 	
-     	 	var t1 = $("table#export_summary tbody").empty();
-     	 	var t2 = $("table#top_countries tbody").empty();
-     	 	
+            	 //$("#trade-stats-exports").fadeOut();
+             
+             },
+             success: function (data) {
+            	 
+            	if (!data || data.length == 0) return;
+          	 	
+            	 $('#waiting').hide();
+            	
+          	 	var t1 = $("table#export_summary tbody").empty();
+          	 	var t2 = $("table#top_countries tbody").empty();
+          	 	
+          	 
+          	 	$("#ProdName").text(data.ProdName);    	 	
+          		
+          	 	$("#SumAirLHR").text(number_format(data.SumAirLHR));
+          	 	$("#SumCIPROPRLarger").text(number_format(data.SumCIPROPRLarger));
+          	 	$("#SumCIPROPRsub1m").text(number_format(data.SumCIPROPRsub1m));
+          	 	$("#SumCLarges").text(number_format(data.SumCLarges));
+          	 	
+          	 	// two of the same
+          	 	$("#SumCSmalls").text( number_format(data.SumCSmalls));
+          	 	$("#SumCSmalls2").text( number_format(data.SumCSmalls));
 
-     	 	$("#ProdName").text(data.ProdName);    	 	
-     	 	
-     	 	$("#SumAirLHR").text(number_format(data.SumAirLHR));
-     	 	$("#SumCIPROPRLarger").text(number_format(data.SumCIPROPRLarger));
-     	 	$("#SumCIPROPRsub1m").text(number_format(data.SumCIPROPRsub1m));
-     	 	$("#SumCLarges").text(number_format(data.SumCLarges));
-     	 	$("#SumCSmalls").text( number_format(data.SumCSmalls));
-     	 	$("#SumOtherAir").text(number_format(data.SumOtherAir));
-     	 	$("#SumReexCSub1m").text(number_format(data.SumReexCSub1m));
-     	 	$("#SumReexLarger").text(number_format(data.SumReexLarger));
-     	 	$("#SumSea").text(number_format(data.SumSea));
-     	 	$("#SumVLarges").text(number_format(data.SumVLarges));
-     	 	$("#SumVSmalls").text(number_format(data.SumVSmalls));
-     	 	
-     	 	var SumV = number_format(Math.round((data.SumVSmalls + data.SumVLarges)/1000000000, 2)); 
-     	 	if (SumV>2000000000) {
-     	 		$("#SumV").text(SumV+' billion');
-     	 	} else {
-     	 		$("#SumV").text(number_format(Math.round((data.SumVSmalls + data.SumVLarges)/1000000, 2))+' million');
-     	 	}
-     	 	   
-    	 	var SumC = number_format(data.SumCSmalls + data.SumCLarges);
-    	 	$("#SumC").text(SumC);
-    	 	
-    	 	var PercentVSmall = number_format( Math.round(data.SumVSmalls/1000000));
-    	 	$("#PercentVSmall").text(PercentVSmall);
-     	 	     	 	
-     	 	for (n in data) {
-     	 		if (n == 'ProdName') {
-     	 			$("#goods_section").text(data[n])
-     	 		} else if (n == 'top_countries_list') {
-     	 			// console.log('got here')
-     	 			for (p in data[n]) {
-     	 				$("<tr><td>" + data[n][p]['Country'] + "</td><td>" + 
-     	 						number_format(data[n][p]['Value']) + "</td></tr>").appendTo(t2)
-     	 			}
-     	 		} else {
-     	 			$("<tr><td>" + n + "</td><td>" + data[n] + "</td></tr>").appendTo(t1)
-     	 		// parseInt(data[n]).toLocaleString('en-UK', {maximumSignificantDigits: 6})
-     	 		}
-     	 	};
-
-     	 }, "json");
-       	 
-     	$("#trade-stats-placeholder").hide();
-     	$("#trade-stats").fadeIn();
+          	 	$("#SumOtherAir").text(number_format(data.SumOtherAir));
+          	 	$("#SumReexCSub1m").text(number_format(data.SumReexCSub1m));
+          	 	$("#SumReexLarger").text(number_format(data.SumReexLarger));
+          	 	$("#SumSea").text(number_format(data.SumSea));
+          	 	$("#SumVLarges").text(number_format(data.SumVLarges));
+          	 	$("#SumVSmalls").text(number_format(data.SumVSmalls));
+          	 	
+          	 	var SumV = number_format((data.SumVSmalls + data.SumVLarges)); 
+          	 	$("#SumV").text(SumV);
+          	 	   
+         	 	var SumC = number_format(data.SumCSmalls + data.SumCLarges);
+         	 	$("#SumC").text(SumC);
+         	 	
+         	 	//var PercentVSmall = 100* Math.round(data.SumVSmalls/SumV,1);
+         	 	$("#PercentVSmall").text(number_format(data.SumVSmalls));
+          	 	     	 	
+          	 	for (n in data) {
+          	 		if (n == 'ProdName') {
+          	 			$("#goods_section").text(data[n])
+          	 		} else if (n == 'top_countries_list') {
+          	 			// console.log('got here')
+          	 			for (p in data[n]) {
+          	 				$("<tr><td>" + data[n][p]['Country'] + "</td><td>" + 
+          	 						number_format(data[n][p]['Value']) + "</td></tr>").appendTo(t2)
+          	 			}
+          	 		} else {
+          	 			$("<tr><td>" + n + "</td><td>" + data[n] + "</td></tr>").appendTo(t1)
+          	 		// parseInt(data[n]).toLocaleString('en-UK', {maximumSignificantDigits: 6})
+          	 		}
+          	 	};
+            	 
+             }
+         });
+    	 
+    	 
+         	 
+     	$("#trade-stats-exports").fadeIn();
      	
      	return false;
     
      
      	
+     } else if (d.type =="hscode" && d.direction == "Imported") { 
+    	 
+    	 
+    	 $("#trade-stats-exports").hide();
+    	 $("#trade-stats-placeholder").hide();
+         $("#trade-stats-imports").show();
+         	
+    	 
      }
  
      
@@ -632,24 +790,11 @@ d3.select('button#reset').on('mousedown', function(d) {
 
     
 
-var nodes, 
-	links,
-	context,
-	canvas, 
-	simulation,
-	label_detail;
-	
 
-label_detail = 10;
+function draw(nodes, links) {
+
 		
-var trans = d3.zoomIdentity; //<-- identity
-
-var brush;
-var temp_pan_x, temp_pan_y;
-
-
-function draw() {
-
+	
 	 simulation = d3.forceSimulation(nodes)
 	 
 	// .alpha(0.5)
@@ -660,15 +805,12 @@ function draw() {
 	    .on("tick", ticked);
 
 	// var center_force = d3.forceCenter(width / 2, height / 2);  
-
 	
 	 canvas = document.querySelector("canvas"),
 	    context = canvas.getContext("2d"),
 	//    width = canvas.width,
 	//    height = canvas.height;
 	  
-	
-	
 	d3.select(canvas)
 	    .call(d3.drag()
 	        .container(canvas)
@@ -676,37 +818,27 @@ function draw() {
 	        .on("start", dragstarted)
 	        .on("drag", dragged)
 	        .on("end", dragended));
-	 
-	
-	
+	 	
 	d3.select(canvas).on("mousemove",tooltip);
-	
-//	  brush.call(d3.brush()
-	//	        .extent([[0, 0], [width, height]])
-		 //       .on("start", brushstarted)
-	//	        .on("brush", brushed)
-		//        .on("end", brushended));
-	
+		
 	
     function zoomed(d) {
 		  trans = d3.event.transform; //<-- set to current transform
 		
-			console.log("x=" + trans.x + " y=" + trans.y + " k=" +trans.k);		  
-
-		  
+			console.log("x=" + trans.x + " y=" + trans.y + " k=" +trans.k);		  		  
 		  //context.translate()
 		  ticked(); //<-- use tick to redraw regardless of event
 		}
 	    
 	  //now the zooming part
-	   d3.select(canvas)
+	 d3.select(canvas)
 	   		.call(d3.zoom()
 	   				.scaleExtent([0.2, 10])
-	   			
 	   				.on("zoom", zoomed));
 
 		
 	d3.select(canvas).on('click', click);
+
 	    
 	d3.select('#labelrange').on('input', function() {
 		
@@ -714,9 +846,21 @@ function draw() {
 		ticked();
 	});
 	 
+	d3.select('#reset').on('mousedown', function() {
 	
-
-
+		fixed_layout = false;
+		
+		simulation = d3.forceSimulation(nodes)
+		 
+		// .alpha(0.5)
+		    .force("charge", d3.forceManyBody().strength(-40))
+		    .force("link", d3.forceLink(links).distance(20).strength(2))
+		    .force("x", d3.forceX())
+		    .force("y", d3.forceY())
+		    .on("tick", ticked);
+	
+				
+	});
 	
 	function ticked() {
 					
@@ -741,10 +885,8 @@ function draw() {
 	  	nodes.forEach(drawNode);
 	  	
 	 	if (fixed_layout) {
-				
-				nodes[0].x = 0;
-				nodes[0].y = 0;
-		
+			nodes[0].x = 0;
+			nodes[0].y = 0;
 		}
 	  
   		
@@ -786,9 +928,19 @@ function dragged() {
 
 function dragended() {
   if (!d3.event.active) simulation.alphaTarget(0);
-  //d3.event.subject.fx = null;  Commenting out makes sticky
-  //d3.event.subject.fy = null;
+  
+  if (d3.event.subject.type != "company") {
+  	d3.event.subject.fx = null;  
+  	d3.event.subject.fy = null;
+  }
+  
 
+}
+
+function dblclick() {
+	  if (!d3.event.active) simulation.alphaTarget(0);
+	  d3.event.subject.fx = null;  
+	  d3.event.subject.fy = null;
 }
 
 function drawLink(d) {
@@ -890,7 +1042,7 @@ function drawNode(d) {
 		if (d.direction == "Imported") context.fillStyle = "yellow";
 		else if (d.direction == "Exported") context.fillStyle = "green";
 		else {
-			context.fillText(pos_str,d.x+1.1*r,d.y-1.1*r);
+			//context.fillText(pos_str,d.x+1.1*r,d.y-1.1*r);
 			context.fillStyle = "purple";
 		}
 		

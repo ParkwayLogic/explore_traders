@@ -32,7 +32,6 @@ def suggest_encodings(char_error_code, char_to_find=None):
     """
     for enc in all_encodings():
         try:
-            # msg = char_error_code.decode(enc)
             msg = char_error_code.decode(enc)
         except Exception:
             continue
@@ -65,21 +64,24 @@ deft_CNlist = [84118280, 84119900, 94033019, 94034090, 82121090, 84191100,
 1022949, 1061900, 3023519, 48025890, 48026115, 48026180, 48041190, 63014090, 
 63022290, 70131000, 70132210]
 
-def wordcloud(CNlist=deft_CNlist, howmany=20):
+def wordcloud(df, CNlist=deft_CNlist, howmany=20):
 	"""Returns lowercase wordcloud for commodities"""
 	wcloud = defaultdict(int)
-	stopwords = ['of', 'and', 'in', 'with', '.', '=', '<', '>', 'a', 'the', 
-	'for', 'or', '(', ')', ',', 'but', 'any', 'by', "''", '``', 'which', '%', 
-	'consists']
-	stopwords = stopwords + ['excl', 'total', 'n.e.s', 'other', 'purposes', 'like']
+	stopwords = ['of', 'and', 'in', 'with', '.', "'", '=', '<', '>', 'a', 'the',
+	';', '(', ')', ',', '``',  "''", '/', '[', ']', 
+	'for', 'or', 'but', 'any', 'by', '%',
+	'which', 'consists', 'their', 'similar', 'thereof', "'s,'", 'those']
+	stopwords = stopwords + ['not', 'neither', 'whether', 'excl', 'incl', 'total',
+	'n.e.s', 'other', 'purposes', 'like', 'articles', 'heading', 'up', 'put',
+	'principally']
 	for c in CNlist:
-		desc = get_desc_by_CN(str(c))['Self-Explanatory text (English)'].values
+		desc = get_desc_by_CN(df, str(c))['Self-Explanatory text (English)'].values
 		tokens = nltk.word_tokenize(str(desc[0]).lower())  #.split(' ')
 		for tk in tokens:
 			if tk not in stopwords: wcloud[tk] += 1
 
 	wcloud = sorted(wcloud.items(), key=lambda tup: tup[1], reverse=True)
-	[print(w, c) for w, c in wcloud[:howmany]]
+	return [w for w, c in wcloud[:howmany]]
 
 
 def _make_8char_CN(trialstring):
@@ -130,7 +132,7 @@ def get_CN_by_text(searchstring, verbose=False):
     except:
     	if shall_log: logging.error('invalid search string in get_CN_list()')
     	return 0
-    df = pd.read_csv('C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\2017_CN.txt', sep='\t', 
+    df = pd.read_csv('2017_CN.txt', sep='\t', 
     	encoding='utf-16', warn_bad_lines=True)
     searchstring = str(searchstring).lower()
     if verbose and shall_log: logging.info(
@@ -160,12 +162,12 @@ def get_desc_by_HSchapter(chapternum, verbose=False):
 	return outdf
 
 
-def get_desc_by_CN(df, CNcode, verbose=False):
+def get_desc_by_CN(df, CNcode, backup_database_path=None, verbose=False):
 	try:
 		assert (len(str(CNcode))==8) | (len(str(CNcode))==7)
 	except:
-		if shall_log: logging.error(
-			'invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
+		# if shall_log: logging.error(
+		# 	'invalid CN code {0} supplied to get_desc_by_CN()'.format(CNcode))
 		outdf = pd.DataFrame({
 			'Commodity Code': [str(CNcode)],
 			'Supplementary Unit': ['unk'],
@@ -174,11 +176,6 @@ def get_desc_by_CN(df, CNcode, verbose=False):
 		print('goods code exception in get_desc_by_CN - requires 7 or 8 digits')
 		return outdf
 	if len(str(CNcode))==7: CNcode = '0'+str(CNcode)
-	# df = pd.read_csv('2017_CN.txt', sep='\t', 
-	# 	encoding='utf-16', warn_bad_lines=True)
-	# foundstrings = df.loc[df.loc[:,'Commodity Code'].map(
-	# 	lambda x: _make_8char_CN(x)[:8]
-	# 	).str.match(CNcode),:]
 	foundstrings = df.loc[df.loc[:,'Commodity Code'].str.match(CNcode),:]
 	# print(foundstrings)
 	# except:
@@ -186,8 +183,15 @@ def get_desc_by_CN(df, CNcode, verbose=False):
 		outdf = pd.DataFrame({
 			'Commodity Code': [CNcode],
 			'Supplementary Unit': ['unk'],
-			'Self-Explanatory text (English)': ['Code not found']
+			'Self-Explanatory text (English)': ['Old code / Code not found']
 			})
+		# TODO: look up earlier CN definitions lists and pre-pend 'old code'
+		# to the Self-Explanatory text
+		if backup_database_path:
+			df2 = pd.read_csv(backup_database_path+'2016_CN.txt', sep='\t',
+				dtype='str', encoding='utf-16', warn_bad_lines=True)
+			outdf = get_desc_by_CN(df2, CNcode)
+			outdf['Self-Explanatory text (English)'] = 'OLD CODE: '+outdf['Self-Explanatory text (English)']
 		# print('empty df', end=' ')
 		# _print_HS(outdf)
 	else:
