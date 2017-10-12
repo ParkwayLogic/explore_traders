@@ -6,159 +6,417 @@
 	href="https://bootswatch.com/cosmo/bootstrap.min.css">
 
 <script src="https://use.fontawesome.com/1dc8d7edaf.js"></script>
-
-	<script type="text/javascript"
-		src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script type="text/javascript"
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 
 <style>
 #container {
-	display: relative;
+	
 	width: 100%;
-	height: 75%;
+	height: 50%;
+	border: 1px dotted #CCC;
+}
+
+
+.input{
+
+padding:5px;
+width: 80%;
+
 }
 
 body {
+	font-size:13px;
+	color:#333;
+}
+.table {
 
-font-size:12px;
+	font-size:13px;
+
 }
 
-	div#tooltip {
-		  position: absolute;        
-			display: inline-block;
-			padding: 10px;
-			font-family: 'Open Sans' sans-serif;
-			color: #000;
-		  background-color: #fff;
-			border: 1px solid #999;
-			border-radius: 2px;
-		  pointer-events: none;
-			opacity: 0;
-			z-index: 1;
-		}
+.btn {
 
+	margin:5px;
+
+}
+
+.ui-widget {
+
+	font-family: 'Open Sans', sans-serif;
+	font-size: 13px;
+
+}
+
+.ui-widget input{
+
+	font-family: 'Open Sans', sans-serif;
+	font-size: 13px;
+	border-radius: none;
+	
+
+}
+
+.ui-widget button{
+
+	font-family: 'Open Sans', sans-serif;
+	font-size: 13px;
+
+}
+
+
+.trade-stats-explain {
+	padding:10px;
+	float:left;
+	font-size:10px;
+	bottom:0;
+	position:absolute;
+
+}
+
+.title{
+
+	font-size:18px;
+	font-weight:700;
+	padding-top:10px;
+	float:left;
+}
+
+.legend {
+	padding:10px;
+	float:right;
+	font-size:10px;
+}
+
+
+.controls {
+
+    position: absolute;
+    right: 0px;
+    top: 30px;
+    width: 150px;
+    padding: 10px;
+    font-size: 10px;
+
+
+}
+
+div#tooltip {
+	position: absolute;
+	display: inline-block;
+	padding: 2px;
+	font-family: 'Open Sans' sans-serif;
+	color: #000;
+	background-color: #fff;
+	border: 1px solid #999;
+	border-radius: 2px;
+	pointer-events: none;
+	opacity: 0;
+	z-index: 1;
+}
 </style>
+
+<script>
+function number_format(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+</script>
+
+		
+
 
 <body>
 	<div class="container">
-		<div class="row" >
-			
+		<div class="row">
+
 			<div class="col-sm-12 col-md-12">
-			<h2><b>International trade graph explorer</b></h2>
-			
+				<h2>
+					<b>International trade graph explorer</b>
+				</h2>
+
 			</div>
 		</div>
-		<div style="margin-top:20px" class="row">
-			<div  class="col-sm-4 col-md-4">
-				Select a trader <select id="company_str" name="company_str">
-						<option selected="selected" value="KOTTKE LTD">KOTTKE LTD</option>
-						<option value="ALEXANDER MILLS">ALEXANDER MILLS</option>
-						<option value="SIM FREE LTD">SIM FREE LTD</option>
-						<option value="BAKER HUGHES LTD">BAKER HUGHES LTD</option>
-						<option value="WEATHERFORD UK LTD">WEATHERFORD UK LTD</option>
-					</select> 
-				</div>
-					
-			<div class="col-sm-4 col-md-4">
-								
-					<button id="search" class="btn btn-default btn-xs">Search</button>
-					<button id="split" class="btn btn-default btn-xs">Split</button>
-					<button id="reset" class="btn btn-default btn-xs">Reset</button>
-
-				</div>
+		<div style="margin-top: 20px; margin-bottom:20px" class="row">
 			
-			<div class="col-sm-4 col-md-4">
+			<div class="col-sm-4 col-md-5">
+				
+				<div class="ui-widget">	
+					<div>
+					Search for a trader
+					</div>
+					<input class="input" id="query" name="query">
+					<button id="search" class="btn btn-primary btn-sm">Show</button>
+					
+					<input id="n" name="n" value="2" type="hidden">
+					<input id="lim" name="lim" value="100" type="hidden">
+					<input id="q" name="q" type="hidden">
+	
+				</div>
+			</div>
+			
+			
+			
+			<div class="col-sm-4 col-md-5">
+				<div>Example trader 
+				</div>
+				<select class="input" id="example_company" name="example_company">
+					<option selected="selected" value="KOTTKE LTD">KOTTKE LTD</option>
+					<option value="ALEXANDER MILLS">ALEXANDER MILLS</option>
+					<option value="SIM FREE LTD">SIM FREE LTD</option>
+					<option value="BAKER HUGHES LTD">BAKER HUGHES LTD</option>
+				</select>
+				<button id="go" class="btn btn-primary btn-sm">Display</button>
+
+			</div>
+
+
+			<div class="col-sm-2 col-md-2">
+
+				<button id="split" class="btn btn-warning btn-sm">Centre</button>
+				<button id="reset" class="btn btn-success btn-sm">Refresh</button>
+
+			</div>
+
+		</div>
+		
+		
+	
+
+	<div class="row">
+
+		<div class="col-md-12" id="container">
+		<div id="title" class="title"></div>
+		<div id="legend" class="legend">
+
+			
+			<i style="color: purple" class="fa fa-circle"
+				aria-hidden="true"></i> Focus company
+				<i style="color: red" class="fa fa-circle"
+				aria-hidden="true"></i> Import good
+				<i style="color: blue" class="fa fa-circle"
+				aria-hidden="true"></i> Export good
+				<i style="color: yellow" class="fa fa-circle"
+				aria-hidden="true"></i> Importer
+				<i style="color: green" class="fa fa-circle"
+				aria-hidden="true"></i> Exporter
+			
+			</div>
+			
+			<div id="controls" class="controls">
+
 				<div>
-					Show companies <select id="num_nodes" name="num_nodes">
+				
+					Goods in common <select id="num_nodes" name="num_nodes">
 						<option value="1">1</option>
 						<option selected="selected" value="2">2</option>
 						<option value="3">3</option>
-
-					</select> common goods
+					</select>
+					
 				</div>
-
+				
 				<div>
-					Limit the number of nodes shown to <select id="node_limit"
+				
+					Nodes limit <select id="node_limit"
 						name="node_limit">
 						<option value="10">10</option>
 						<option selected="selected" value="100">100</option>
 						<option value="1000">1,000</option>
 						<option value="10000">10,000</option>
 					</select>
-				</div>
-
-
-			</div>
-		</div>
-
-	<div id="container"></div>
-
-	<div id="container"></div>
-	<div id="tooltip">hello</div>
-
-		<div  style="background:#ccc; "  class="row">
-			
-			<div class="col-sm-1 col-md-1"><b>Commodity code</b></div>
-			<div class="col-sm-2 col-md-2">
-				<span id="cn_code">Explore</span>
-
-			</div>
-			
-			<div class="col-sm-1 col-md-1"><b>Description</b></div>
-			<div class="col-sm-8 col-md-8">
+				</div>	
 				
-			<span id="goods_descriptions">Click on a red import node <i style="color:red" class="fa fa-circle" aria-hidden="true"></i> or blue export node <i style="color:blue" class="fa fa-circle" aria-hidden="true"></i> .</span>
-
-			</div>
+			
+				<div>
+					<input type="range" min="0" max="50" value="10" class="slider"
+						id="labelrange">
+					<span style="float:left">No labels</span>	
+					<span style="float:right">More</span>
+				</div>
+				
+			</div>	
+			
+			
+		<div class="trade-stats-explain">Explore goods by clicking on a blue import good <i style="color: blue" class="fa fa-circle" aria-hidden="true"></i> or
+				red import good node <i style="color: red" class="fa fa-circle" aria-hidden="true"></i> to reveal export trading below.
+		</div>	
 		</div>
 
-		<div  style="background:#dee; "  class="row">
+		<div id="tooltip">hello</div>
+		
+		
 
-			<div class="col-sm-2 col-md-2"><b>Export summary Jul '16 to Apr '17</b>
-				<h3><span id="goods_section"></span></h3></div>
-			<div class="col-sm-4 col-md-4">
-				<table id="export_summary" class="table table-striped table-hover">
-	                <thead>
-	                <tr>
-	                    <th>Item</th>
-	                    <th>Value (&pound;)</th>
-	                </tr>
-	                </thead>
-	                <tbody>
-	                </tbody>
+
+		
+		
+
+		</div>
+	
+
+<div id="trade-stats-placeholder"></div>
+
+<div id="trade-stats" style="display:none">
+	<div class="row">
+
+		<div class="col-md-12">
+			
+			<h3><b>Trade statistics</b></h3>
+		
+			<p>Sales within the <span id="cn_code"></span> commodity code (<span id="ProdName"></span>) from the UK to all destinations across the world from Jul 2016 to Apr 2017 accounted for 
+			&pound;<span id="SumV"></span>,
+			which were carried out in 
+			<span id="SumC"> </span> shipments.</p>
+
+			<p>Trades that were worth less than &pound;1 million accounted for 
+			&pound;<span id="PercentVSmall"> </span> million of this total, carried out in 
+			<span id="SumCSmalls"></span> shipments.
+			</p>
+		</div>
+	</div>
+
+
+		<div class="row">
+		
+		<div class="col-md-6 col-sm-6">
+				
+			<table class="table table-striped table-condensed">
+	         
+	         <tr><td colspan=2><b>Details</b></td></tr>
+			
+			<tr><td>Value of large exports (&gt; 1m)</td><td><span id="SumVLarges"></span></td></tr>
+			<tr><td>Value of smaller exports (&lt; 320k)</td><td><span id="SumVSmalls"></span></td></tr>
+			<tr><td>No of large exports</td><td><span id="SumCLarges"></span></td></tr>
+			<tr><td>No of small exports</td><td><span id="SumCSmalls"></span></td></tr>
+		
+
+			<tr><td colspan=2><b>Shipping details</b></td></tr>
+			<tr><td>Number by sea</td><td><span id="SumSea"></span></td></tr>
+			<tr><td>Number by London Heathrow</td><td><span id="SumAirLHR"></span></td></tr>
+			<tr><td>Number by other airports</td><td><span id="SumOtherAir"></span></td></tr>
+			
+			<tr><td colspan=2><b>Customs</b></td></tr>
+			<tr><td>For re-export &lt; &pound;1m</td><td><span id="SumReexCSub1m"></span></td></tr>
+			<tr><td>For re-export &gt; &pound;1m</td><td><span id="SumReexLarger"></span></td></tr>
+			<tr><td>Inward/outward process relief &gt; &pound;1m</td><td><span id="SumCIPROPRLarger"></span></td></tr>
+			<tr><td>Not using </td><td><span id="SumCIPROPRsub1m"></span></td></tr>
+			
+			
+
+	                    
+	                    
+	          
+	       
 	            </table>
-				<!-- <span id="export_summary">
-				</span> -->
+				
 			</div>
-			<div class="col-sm-4 col-md-4">
-				<table id="top_countries" class="table table-striped table-hover">
+			<div class="col-sm-6 col-md-6">
+				<table id="top_countries" class="table table-striped table-condensed">
 	                <thead>
 	                <tr>
-	                    <th>Country</th>
-	                    <th>Value (&pound;)</th>
+	                    <td><b>Country</b></td>
+	                    <td><b>Value (&pound;m)</b></td>
 	                </tr>
 	                </thead>
-	                <tbody>
-	                </tbody>
+	                
+	                <tbody></tbody>
+	                
 	            </table>
-				<!-- <span id="export_summary">
-				</span> -->
+		
 			</div>
 		</div>
 
 	</div>
+</div>
 
+</div>
 
-<script>
+	<script>
 
-var width = 800, height = 600;
+	
+var width = $('#container').width(), height=$('#container').height();
 var canvas = d3.select('#container').append('canvas').attr('width', width).attr('height', height);
 
+$(function() {
+	
+	$("#query").autocomplete({
+		source : function(request, response) {
+			$.ajax({
+				url : "/companies",
+				type : "GET",
+				crossDomain : true,
+				
+				contentType : "application/json",
+				dataType : 'json',
+				data : {
+					q : request.term
+				},
+				
+				success : function(data) {
 
-$("#search").click( function()
-	       {
-		  var query=$("#company_str").val();
+					response($.map(data.names, function(item, idx) {
+						return {
+							label : item.name
+							//regnum: item.company_number
+							
+						};
+					}));
+					
+					
+				
+				}
+			});
+		},
+		minLength : 2,
+		select : function(event, ui) {
+			
+	//		$("#regnum").val(ui.item.regnum);
+		//	$("#company_name").val(ui.item.label);
+			$("#q").val( encodeURIComponent(ui.item.names));
+			
+		},
+		open : function() {
+			$(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+		},
+		close : function() {
+			$(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+		}
+	});
+});
+
+
+$("#search").click( function() {
+	 
+	var query=$("#query").val();
+	var query2=$("#n").val();
+	var query3=$("#lim").val();
+		  
+		d3.json("/graph?q=" + encodeURIComponent(query) + 
+				"&n=" + encodeURIComponent(query2) +
+				"&lim=" + encodeURIComponent(query3) , function(error, json) {
+		  if (error) throw error;
+		       		  
+		  	graph = json;
+		  
+			nodes = graph.nodes;
+	   		links = graph.links;
+		
+	   		   		
+	   		draw();
+		});
+		
+		$('#title').text(query);
+		
+	    }
+);	
+
+$("#go").click( function() {
+		 
+	var query=$("#example_company").val();
 		  var query2=$("#num_nodes").val();
 		  var query3=$("#node_limit").val();
 		  
@@ -175,25 +433,31 @@ $("#search").click( function()
 	   		   		
 	   		draw();
 		});
-	       }
+		
+		$('#title').text(query);
+		
+	    }
 );	
 
 
+var fixed_layout;
   
 d3.select('button#split').on('mousedown', function(d) {
 
+	fixed_layout = true;
+	
 	simulation.stop();
-
+	
 	simulation
 		.force('charge', d3.forceManyBody().strength(
 				function(d) { 
 				
-					return d.type === "company" ? -100 : 0; 
+					return d.type === "company" ? -250 : 0; 
 					
 				} 		
 		
 		))
-		 .force("link", d3.forceLink(links).distance(40).strength(1))
+		 .force("link", d3.forceLink(links).distance(100).strength(5))
 		.force('xPos', d3.forceX(function(d) { 
 			
 			return d.direction === "Imported" ? width * -0.5 : width * 0.5; 
@@ -207,8 +471,7 @@ d3.select('button#split').on('mousedown', function(d) {
 		
 	simulation.alpha(0.5);
 
-	nodes[0].x = 0;
-	nodes[0].y = 0;
+	
 	
 	simulation.restart();
 
@@ -270,7 +533,8 @@ d3.select('button#reset').on('mousedown', function(d) {
         var query2=$("#num_nodes").val();
         var query3=$("#node_limit").val();	
 		
-        $("#company_str").val(d.name);
+        $("#title").text(d.name);
+        
         
         d3.json("/graph?q=" + encodeURIComponent(query) + 
 				"&n=" + encodeURIComponent(query2) +
@@ -290,43 +554,78 @@ d3.select('button#reset').on('mousedown', function(d) {
    		});
      }
      
-     else if (d.type =="hscode") { 
+     else if (d.type =="hscode" && d.direction == "Exported") { 
     	 
     	 var searchstring = "/descriptions?cn1=" + d.name;
     	 
-    	 $.get(searchstring, function(data, status){$("#goods_descriptions").text(data)});
+    	 $.get(searchstring, function(data, status){$("#goods_descriptions").text(data.description)});
     	 
     	 $("#cn_code").text(d.name);
-
+    	 
     	 var searchstring2 = "/HS_tool?cn1=" + d.name;
+		
+    
+       	 $.get(searchstring2, function(data, status, xhr){
 
-    	 $.get(searchstring2, function(data, status, xhr){
+     	 	if (!data || data.length == 0) return;
+     	 	
+     	 	var t1 = $("table#export_summary tbody").empty();
+     	 	var t2 = $("table#top_countries tbody").empty();
+     	 	
 
-    	 	if (!data || data.length == 0) return;
+     	 	$("#ProdName").text(data.ProdName);    	 	
+     	 	
+     	 	$("#SumAirLHR").text(number_format(data.SumAirLHR));
+     	 	$("#SumCIPROPRLarger").text(number_format(data.SumCIPROPRLarger));
+     	 	$("#SumCIPROPRsub1m").text(number_format(data.SumCIPROPRsub1m));
+     	 	$("#SumCLarges").text(number_format(data.SumCLarges));
+     	 	$("#SumCSmalls").text( number_format(data.SumCSmalls));
+     	 	$("#SumOtherAir").text(number_format(data.SumOtherAir));
+     	 	$("#SumReexCSub1m").text(number_format(data.SumReexCSub1m));
+     	 	$("#SumReexLarger").text(number_format(data.SumReexLarger));
+     	 	$("#SumSea").text(number_format(data.SumSea));
+     	 	$("#SumVLarges").text(number_format(data.SumVLarges));
+     	 	$("#SumVSmalls").text(number_format(data.SumVSmalls));
+     	 	
+     	 	var SumV = number_format(Math.round((data.SumVSmalls + data.SumVLarges)/1000000000, 2)); 
+     	 	if (SumV>2000000000) {
+     	 		$("#SumV").text(SumV+' billion');
+     	 	} else {
+     	 		$("#SumV").text(number_format(Math.round((data.SumVSmalls + data.SumVLarges)/1000000, 2))+' million');
+     	 	}
+     	 	   
+    	 	var SumC = number_format(data.SumCSmalls + data.SumCLarges);
+    	 	$("#SumC").text(SumC);
     	 	
-    	 	var t1 = $("table#export_summary tbody").empty();
-    	 	var t2 = $("table#top_countries tbody").empty();
-    	 	
-    	 	for (n in data) {
-    	 		if (n == 'ProdName') {
-    	 			$("#goods_section").text(data[n])
-    	 		} else if (n == 'top_countries_list') {
-    	 			// console.log('got here')
-    	 			for (p in data[n]) {
-    	 				$("<tr><td>" + data[n][p]['Country'] + "</td><td>" + 
-    	 					data[n][p]['Value'] + "</td></tr>").appendTo(t2)
-    	 			}
-    	 		} else {
-    	 			$("<tr><td>" + n + "</td><td>" + data[n] + "</td></tr>").appendTo(t1)
-    	 		// parseInt(data[n]).toLocaleString('en-UK', {maximumSignificantDigits: 6})
-    	 		}
-    	 	};
+    	 	var PercentVSmall = number_format( Math.round(data.SumVSmalls/1000000));
+    	 	$("#PercentVSmall").text(PercentVSmall);
+     	 	     	 	
+     	 	for (n in data) {
+     	 		if (n == 'ProdName') {
+     	 			$("#goods_section").text(data[n])
+     	 		} else if (n == 'top_countries_list') {
+     	 			// console.log('got here')
+     	 			for (p in data[n]) {
+     	 				$("<tr><td>" + data[n][p]['Country'] + "</td><td>" + 
+     	 						number_format(data[n][p]['Value']) + "</td></tr>").appendTo(t2)
+     	 			}
+     	 		} else {
+     	 			$("<tr><td>" + n + "</td><td>" + data[n] + "</td></tr>").appendTo(t1)
+     	 		// parseInt(data[n]).toLocaleString('en-UK', {maximumSignificantDigits: 6})
+     	 		}
+     	 	};
 
-    	 }, "json");
-    	 return false;
-
-     }
+     	 }, "json");
+       	 
+     	$("#trade-stats-placeholder").hide();
+     	$("#trade-stats").fadeIn();
+     	
+     	return false;
+    
      
+     	
+     }
+ 
      
 	}
     
@@ -337,11 +636,16 @@ var nodes,
 	links,
 	context,
 	canvas, 
-	simulation;
+	simulation,
+	label_detail;
+	
 
+label_detail = 10;
+		
 var trans = d3.zoomIdentity; //<-- identity
 
 var brush;
+var temp_pan_x, temp_pan_y;
 
 
 function draw() {
@@ -349,8 +653,8 @@ function draw() {
 	 simulation = d3.forceSimulation(nodes)
 	 
 	// .alpha(0.5)
-	    .force("charge", d3.forceManyBody().strength(-50))
-	    .force("link", d3.forceLink(links).distance(20).strength(1))
+	    .force("charge", d3.forceManyBody().strength(-40))
+	    .force("link", d3.forceLink(links).distance(20).strength(2))
 	    .force("x", d3.forceX())
 	    .force("y", d3.forceY())
 	    .on("tick", ticked);
@@ -374,6 +678,7 @@ function draw() {
 	        .on("end", dragended));
 	 
 	
+	
 	d3.select(canvas).on("mousemove",tooltip);
 	
 //	  brush.call(d3.brush()
@@ -385,7 +690,11 @@ function draw() {
 	
     function zoomed(d) {
 		  trans = d3.event.transform; //<-- set to current transform
-		// context.translate(-trans.x, -trans.y)
+		
+			console.log("x=" + trans.x + " y=" + trans.y + " k=" +trans.k);		  
+
+		  
+		  //context.translate()
 		  ticked(); //<-- use tick to redraw regardless of event
 		}
 	    
@@ -393,30 +702,34 @@ function draw() {
 	   d3.select(canvas)
 	   		.call(d3.zoom()
 	   				.scaleExtent([0.2, 10])
+	   			
 	   				.on("zoom", zoomed));
 
-	
-	
-	
+		
 	d3.select(canvas).on('click', click);
 	    
-	  
-	
+	d3.select('#labelrange').on('input', function() {
+		
+		label_detail = $('#labelrange').val();
+		ticked();
+	});
+	 
 	
 
 
 	
 	function ticked() {
-		
-	
-				
+					
+		context.save();
 		
 	 	context.clearRect(0, 0, width, height);
-	  	context.save();
+	  	
 	  	//context.translate(width / 2, height / 2);
 	  	
 	  	context.translate(trans.x + width/2, trans.y + height/2); //<-- this always applies a transform
-	 	context.scale(trans.k, trans.k);
+	
+			  	
+	  	context.scale(trans.k, trans.k);
 	
 	 	context.beginPath();
 	  	links.forEach(drawLink);
@@ -427,17 +740,21 @@ function draw() {
 	 
 	  	nodes.forEach(drawNode);
 	  	
-	 	
+	 	if (fixed_layout) {
+				
+				nodes[0].x = 0;
+				nodes[0].y = 0;
+		
+		}
 	  
   		
 	  	context.restore();
 	  	
-	  	
-	  	//nodes[0].x = 0;
-		//nodes[0].y = 0;
 	}
 	
 }
+
+
 
 
 var start_x, start_y
@@ -554,10 +871,14 @@ if (d) {
 
 }
 
+
+
+
 function drawNode(d) {
 	
 	var r = Math.pow(d.size,0.25);
 	
+	var pos_str = Math.round(d.x) + "," + Math.round(d.y);
 	context.font="7px Arial";
 	// Companies circles
  		
@@ -568,18 +889,26 @@ function drawNode(d) {
 		
 		if (d.direction == "Imported") context.fillStyle = "yellow";
 		else if (d.direction == "Exported") context.fillStyle = "green";
-		else context.fillStyle = "purple";
+		else {
+			context.fillText(pos_str,d.x+1.1*r,d.y-1.1*r);
+			context.fillStyle = "purple";
+		}
 		
 		context.fill();
 		
 		context.fillStyle = "#333";
 		
-		var pos_str = Math.round(d.x) + "," + Math.round(d.y);
+	
 		
 		
 		// TODO: rank number filter
-		context.fillText(pos_str,d.x+1.1*r,d.y-1.1*r);
+		
+		
+		if (d.rank < label_detail) { 
+		
+		context.fillText(d.name,d.x+1.1*r,d.y-1.1*r);
 
+		}
 		
 	}		
 		

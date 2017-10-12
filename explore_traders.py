@@ -18,15 +18,33 @@ print("Loading app", app.name)
 def get_index():
     return app.send_static_file('index.html')
 
+@app.route("/companies")
+def get_companies():
+    max_entries = 50
+    query = request.args['q'].upper()
+    entry = []
+    OUTPUT = {}
+    global NETX_DB
+    for x in nx.get_node_attributes(NETX_DB, 'type'):
+        if query in x:
+            entry.append({'name': x})
+    if len(entry) > max_entries:
+        entry.insert(0, {'name': 'More available. Keep typing to narrow down...'})
+        OUTPUT['names'] = entry[:max_entries]
+    else:
+        OUTPUT['names'] = entry
+    return Response(dumps(OUTPUT), mimetype="application/json")
+
 @app.route("/HS_tool")
 def get_product_friendly():
     code = request.args['cn1']
-    global DBS_PATH
-    lookup_table = pandas.read_csv(DBS_PATH+'HS2_names_ref.txt', sep='\t', 
-        dtype={'HS2': str, 'HS2Desc': str}, warn_bad_lines=True)
-    chap = utils._make_8char_CN(code)[:2]
-    rows_bool = (lookup_table['HS2']==chap)
-    desc = lookup_table.loc[rows_bool,'HS2Desc'].values[0]
+    # global DBS_PATH
+    # lookup_table = pandas.read_csv(DBS_PATH+'HS2_names_ref.txt', sep='\t', 
+    #     dtype={'HS2': str, 'HS2Desc': str}, warn_bad_lines=True)
+    # chap = utils._make_8char_CN(code)   #[:2]
+    desc = code+'0'   # only this needed if checking against the full-detail DB
+    # rows_bool = (lookup_table['HS2']==chap)
+    # desc = lookup_table.loc[rows_bool,'HS2Desc'].values[0]
     return Response(get_product_totals_from_file(desc), 
         mimetype="application/json")
 
@@ -36,37 +54,49 @@ def get_product_totals_from_file(desc):
     argument desc is the friendly name for the tariff Section
     """
     colnames = [
-        'ProdName', 'Destination', 'Region', 'RegionCount', 'RegionValue',
-        'Status', 'Treaty', 'TreatyCountries', 'TreatyDate', 'TreatyLink',
+        'ProdName', 'Destination', 'DESTA',
         'CSub320k', 'VSub320k', 'C320k1m', 'V320k1m', 'C1m16m', 'V1m16m',
         'CLarger', 'VLarger', 'CSmalls', 'VSmalls', 'CLarges', 'VLarges',
         'CIPROPRsub1m', 'CIPROPRLarger', 'Reexsub1m', 'ReexLarger', 'AirLHR',
         'OtherAir', 'Sea'
-    ]
+    ] 
+    #  'Region', 'RegionCount', 'RegionValue',
+    # 'Status', 'Treaty', 'TreatyCountries', 'TreatyDate', 'TreatyLink',
     coltypes = [
-        'str', 'str', 'str', 'int', 'int',
-        'str', 'str', 'str', 'str', 'str',
-        'int', 'int', 'int', 'int', 'int', 'int', 
-        'int', 'int', 'int', 'int', 'int', 'int', 
-        'int', 'int', 'int', 'int', 'int', 'int', 'int'
+        'str', 'str', 'str', 
+        'float', 'float', 'float', 'float', 'float', 'float', 
+        'float', 'float', 'float', 'float', 'float', 'float', 
+        'float', 'float', 'float', 'float', 'float', 
+        'float', 'float'
     ]
+    # 'str', 'int', 'int',
+    # 'str', 'str', 'str', 'str', 'str',
     colnas = [
-        '-', '-', '-', 0, 0,
-        '-', '-', '-', '-', '-', 
+        '-', '-', '-',
         0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0,
         0, 0, 0, 0, 0, 0, 0
     ]
+    # '-', 0, 0,
+    # '-', '-', '-', '-', '-', 
     assert len(colnames)==len(coltypes)==len(colnas)
-    coltypesdict = dict(zip(colnames, coltypes))
+    # coltypesdict = dict(zip(colnames, coltypes))
+    coltypesdict = {}
+    fields_list = ['CSub320k', 'VSub320k', 'C320k1m',
+       'V320k1m', 'C1m16m', 'V1m16m', 'CLarger', 'VLarger', 'CSmalls',
+       'VSmalls', 'CLarges', 'VLarges', 'CIPROPRsub1m', 'CIPROPRLarger',
+       'Reexsub1m', 'ReexLarger', 'AirLHR', 'OtherAir', 'Sea']
+    for field in fields_list:
+        coltypesdict[field] = lambda x: utils.conv_to_int(x)
     global DBS_PATH
     hs_lookup_table = pandas.read_csv(
-        DBS_PATH+'HS-country-tool-updated-201708.csv', sep=',', 
-        warn_bad_lines=True) 
+        DBS_PATH+'HS-country-tool-updated-201710.csv', sep=',', 
+        warn_bad_lines=True, index_col=0, converters=coltypesdict)
     # keep_default_na=False, na_values=["NA"], na_filter=False, dtype=coltypesdict,
     hs_lookup_table.fillna(value=dict(zip(colnames, colnas)), inplace=True)
-    rows_bool = (hs_lookup_table['ProdName']==desc)
-    relevant_rows = hs_lookup_table.loc[rows_bool,:]
+    rows_bool = hs_lookup_table['ProdName'].map(
+        lambda x: True if (int(x)==int(desc)) else False)
+    relevant_rows = hs_lookup_table[rows_bool]
     columns_list = [
         'VSmalls', 'VLarges', 'CSmalls', 'CLarges',
         'AirLHR', 'OtherAir', 'Sea', 
@@ -91,7 +121,10 @@ def get_product_totals_from_file(desc):
     print(top_countries_list[:10])
     output_values['top_countries_list'] = top_countries_list[:10]
 
-    output_values['ProdName'] = str(desc)
+    DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', 
+        encoding='utf-16', warn_bad_lines=True)
+    output_values['ProdName'] = utils.get_desc_by_CN(DF_CN, str(desc)[:-1]
+        )['Self-Explanatory text (English)'].values[0]  # str(desc)
     print(output_values)
 
     # output_values = [int(sum(relevant_rows.loc[:,col])) for col in columns_list]
@@ -108,7 +141,6 @@ def get_product_totals_from_file(desc):
 
 @app.route("/descriptions")
 def get_descriptions():
-    global DBS_PATH
     code = request.args['cn1']
     global DBS_PATH
     DF_CN = pandas.read_csv(DBS_PATH+'2017_CN.txt', sep='\t', 
@@ -358,7 +390,7 @@ if __name__ == '__main__':
     NETX_DB = nx.Graph()
 # DBS_PATH = 'C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\'
     DBS_PATH = '/Users/ramintakin/Parkway_Drive/Trade_finance/Technology/SIC_HS_tool/'
-    NETX_DB = nx.read_gml(DBS_PATH+'impex_small.graphml')
+    NETX_DB = nx.read_gml(DBS_PATH+'impex_full.graphml')
     print('loaded', NETX_DB.order(), 'nodes and', NETX_DB.size(), 'edges')
     host='127.0.0.1'
     port=8081
