@@ -390,7 +390,7 @@ if __name__ == '__main__':
     NETX_DB = nx.Graph()
     # DBS_PATH = 'C:\\Users\\Chris\\Parkway Drive\\Trade_finance\\Technology\\SIC_HS_tool\\'
     # DBS_PATH = '/Users/ramintakin/Parkway_Drive/Trade_finance/Technology/SIC_HS_tool/'
-    DBS_PATH = '/'
+    DBS_PATH = 'dbs/'
     NETX_DB = nx.read_gml(DBS_PATH+'impex_full.graphml')
     print('loaded', NETX_DB.order(), 'nodes and', NETX_DB.size(), 'edges')
     host='127.0.0.1'
