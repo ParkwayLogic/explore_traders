@@ -68,12 +68,12 @@ def wordcloud(df, CNlist=deft_CNlist, howmany=20):
 	"""Returns lowercase wordcloud for commodities"""
 	wcloud = defaultdict(int)
 	stopwords = ['of', 'and', 'in', 'with', '.', "'", '=', '<', '>', 'a', 'the',
-	';', '(', ')', ',', '``',  "''", '/', '[', ']', 
-	'for', 'or', 'but', 'any', 'by', '%',
-	'which', 'consists', 'their', 'similar', 'thereof', "'s,'", 'those']
+	';', '(', ')', ',', '``',  "''", '/', '[', ']', 'e.g',
+	'on', 'for', 'or', 'but', 'any', 'by', '%', 'to', "'s,'", "'s",
+	'which', 'consists', 'their', 'similar', 'thereof', 'those']
 	stopwords = stopwords + ['not', 'neither', 'whether', 'excl', 'incl', 'total',
 	'n.e.s', 'other', 'purposes', 'like', 'articles', 'heading', 'up', 'put',
-	'principally']
+	'principally', 'subheading']
 	for c in CNlist:
 		desc = get_desc_by_CN(df, str(c))['Self-Explanatory text (English)'].values
 		tokens = nltk.word_tokenize(str(desc[0]).lower())  #.split(' ')

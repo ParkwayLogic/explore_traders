@@ -6,151 +6,153 @@
 	href="https://bootswatch.com/cosmo/bootstrap.min.css">
 
 <script src="https://use.fontawesome.com/1dc8d7edaf.js"></script>
-<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
-<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" type="text/css"
+	href="//fonts.googleapis.com/css?family=Open+Sans" />
+<link rel="stylesheet"
+	href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 <script type="text/javascript"
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 </head>
 
 <style>
 #container {
-	position:relative;
+	position: relative;
 	width: 100%;
 	height: 50%;
 	border: 1px dotted #CCC;
 }
 
 canvas {
-position: absolute;
-left:0;
- top: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
 }
 
-.input{
-
-padding:5px;
-width: 95%;
-
+.input {
+	padding: 5px;
+	width: 95%;
 }
 
 html {
-
 	overflow-y: scroll;
-
 }
 
 body {
-	font-size:13px;
-	color:#333;
+	font-size: 13px;
+	color: #333;
 }
+
+
+
 .table {
-
-	font-size:13px;
-
+	font-size: 13px;
 }
 
 .btn {
-
 	
 }
 
 .ui-widget {
-
 	font-family: 'Open Sans', sans-serif;
 	font-size: 13px;
-
 }
 
-.ui-widget input{
-
+.ui-widget input {
 	font-family: 'Open Sans', sans-serif;
 	font-size: 13px;
-	    
-	    border-top-right-radius:0;
-	            border-top-left-radius:0;
-	            border-bottom-left-radius:0;
-	            border-bottom-right-radius:0;
-	margin-bottom:3px;
-	
-
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	margin-bottom: 3px;
 }
 
-.ui-widget select{
-margin-bottom:3px;
+
+
+.ui-widget select {
+	margin-bottom: 3px;
 }
 
-.ui-widget button{
-
+.ui-widget button {
 	font-family: 'Open Sans', sans-serif;
 	font-size: 13px;
-
 }
-
 
 #trade-stats-placeholder {
-
-padding:35px;
-height: 30%;
-width: 100%;
-
-
+	padding: 35px;
+	height: 30%;
+	width: 100%;
 }
 
 .trade-stats-explain {
-	padding:10px;
-	font-size:10px;
-	
-	width:100%;
-	
-
+	padding: 10px;
+	font-size: 10px;
+	width: 100%;
 }
 
-.title{
-
+.title {
 	position: absolute;
-	font-size:18px;
-	font-weight:700;
-	padding-top:10px;
-	float:left;
+	font-size: 18px;
+	font-weight: 700;
+	padding-top: 10px;
+	float: left;
 }
+
+
+#access_btn {
+	
+	display:none;
+	position: absolute;
+	top:36px;
+	
+}
+
+
 
 .legend {
 	position: absolute;
-	padding:10px;
-	float:left;
-	font-size:10px;
-	
-	bottom:0;
+	padding: 10px;
+	float: left;
+	font-size: 10px;
+	bottom: 0;
+}
+
+#keywords {
+	display: none;
+	position: absolute;
+	padding: 10px;
+	right: 0;
+	font-size: 10px;
+	bottom: 0;
+	max-width: 400px;
 }
 
 .legend p {
-	margin:0px;
+	margin: 0px;
 }
 
-
 .controls {
-
-    position: absolute;
-    right:0;
-    width: 150px;
-    padding: 10px;
-    margin-right:10px;
-    font-size: 10px;
+	position: absolute;
+	right: 0;
+	width: 150px;
+	padding: 10px;
+	margin-right: 10px;
+	font-size: 10px;
 }
 
 .controls div {
-
-	padding-top:5px;
+	padding-top: 5px;
 }
-    
+
 div#tooltip {
 	position: absolute;
 	display: inline-block;
 	padding: 2px;
 	font-family: 'Open Sans' sans-serif;
-	font-size:10px;
+	font-size: 10px;
 	max-width: 450px;
 	color: #000;
 	background-color: #fff;
@@ -162,16 +164,12 @@ div#tooltip {
 }
 
 .beta {
-
-	color:white;
-	background:teal;
-	font-size:14px;
-	font-weight:bold;
+	color: white;
+	background: teal;
+	font-size: 14px;
+	font-weight: bold;
 	padding: 3px;
-
 }
-
-
 </style>
 
 <script>
@@ -179,9 +177,10 @@ function number_format(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+
 </script>
 
-		
+
 
 
 <body>
@@ -190,241 +189,322 @@ function number_format(x) {
 
 			<div class="col-sm-12 col-md-12">
 				<h2>
-					<b>International trade graph explorer</b>
-					<span class="beta">BETA</span>
+					<b>International trade graph explorer</b> <span class="beta">BETA</span>
 				</h2>
 
 			</div>
 		</div>
-		<div style="margin-top: 20px; margin-bottom:20px" class="row">
-			
+		<div style="margin-top: 20px; margin-bottom: 20px" class="row">
+
 			<div class="col-sm-4 col-md-5">
-				
-				<div class="ui-widget">	
-					<div>
-					Search for a trader
-					</div>
+
+				<div class="ui-widget">
+					<div>Search for a trader</div>
 					<input class="input" id="query" name="query">
-					
-					
-				
-	
+
+
+
+
 				</div>
 			</div>
-			
-			
-			
+
+
+
 			<div class="col-sm-4 col-md-5">
-			<div class="ui-widget">
-				<div>...or pick from an example
-				</div>
-				<select class="input" id="example_company" name="example_company">
-					<option disabled selected="selected">Please select</option>
-					<option value="KOTTKE LTD">KOTTKE LTD</option>
-					<option value="ALEXANDER MILLS">ALEXANDER MILLS</option>
-					<option value="COSTCO WHOLESALE UK LIMITED">COSTCO WHOLESALE UK LIMITED</option>
-					<option value="BAKER HUGHES LTD">BAKER HUGHES LTD</option>
-				</select>
-			
+				<div class="ui-widget">
+					<div>...or pick from an example</div>
+					<select class="input" id="example_company" name="example_company">
+						<option disabled selected="selected">Please select</option>
+						<option value="KOTTKE LTD">KOTTKE LTD</option>
+						<option value="TESCO PLC">TESCO PLC</option>
+						<option value="COSTCO WHOLESALE UK LIMITED">COSTCO WHOLESALE UK LIMITED</option>
+						<option value="BAKER HUGHES LTD">BAKER HUGHES LTD</option>
+					</select>
+
 				</div>
 			</div>
 
 
 			<div class="col-sm-2 col-md-2">
-				<div>Layout
-				</div>
+				<div>Layout</div>
 				<div>
-				<button id="split" style="width:60px" class="btn btn-warning btn-sm">ALIGN</button>
-				<button id="reset" style="width:60px" class="btn btn-success btn-sm">RESET</button>
+					<button id="split" style="width: 60px"
+						class="btn btn-warning btn-sm">ALIGN</button>
+					<button id="reset" style="width: 60px"
+						class="btn btn-success btn-sm">RESET</button>
 				</div>
 			</div>
 
 		</div>
-		
-		
-	
-
-	<div class="row">
-
-		<div class="col-md-12" id="container">
-		<canvas id="canvas"></canvas>
-		<div id="title" class="title"></div>
-		<div id="legend" class="legend">
-
-			<p><i style="color: purple" class="fa fa-circle" aria-hidden="true"></i> Focus trader</p>
-			<p> <i style="color: blue" class="fa fa-circle" aria-hidden="true"></i> Goods exported by them
-			<i style="color: green" class="fa fa-circle" aria-hidden="true"></i> companies who also trade these goods </p>
-			<p><i style="color: red" class="fa fa-circle"	aria-hidden="true"></i> Goods imported by them 
-			<i style="color: yellow" class="fa fa-circle" aria-hidden="true"></i> companies who also trade these goods </p>
-			   
-									
-			
-			
-			
-			</div>
-			
-			<div id="controls" class="controls">
-
-				<div>
-				
-					Goods in common <select id="num_nodes" name="num_nodes">
-						<option value="1">1</option>
-						<option selected="selected" value="2">2</option>
-						<option value="3">3</option>
-					</select>
-					
-				</div>
-				
-				<div>
-				
-					Nodes limit <select id="node_limit"
-						name="node_limit">
-						<option value="10">10</option>
-						<option selected="selected" value="100">100</option>
-						<option value="1000">1,000</option>
-						<option value="10000">10,000</option>
-					</select>
-				</div>	
-				
-			
-				<div>
-					<input type="range" min="0" max="50" value="10" class="slider"
-						id="labelrange">
-					<span style="float:left">No labels</span>	
-					<span style="float:right">More</span>
-				</div>
-				
-			</div>	
-			
-			
-		
-		</div>
-
-		<div id="tooltip"></div>
-		
-		
 
 
-		
-		
-
-		</div>
-
-
-<div id="trade-stats-placeholder">
-
-	
-	<h4 style="color:#999999" class="text-center">Reveal trade statistics by clicking on nodes</h4>
-
-	<div class="text-center trade-stats-explain">Exported goods are <i style="color: blue" class="fa fa-circle" aria-hidden="true"></i> circles and 
-imported goods are <i style="color: red" class="fa fa-circle" aria-hidden="true"></i> circles. 
-</div>	
-</div>
-
-<span style="display:none" id="waiting">Please wait ...</span>
-
-<div id="trade-stats-exports" style="display:none">
-
-	<div class="row">
-		<div class="col-md-12">
-			<b>Keywords describing the traded goods: </b>
-			<em><span id="CN_words"></span></em>
-		</div>
-	</div>
-	<div class="row">
-
-		<div class="col-md-12">
-			
-			<h3 class="text-center"><b>Export statistics</b></h3>
-		
-			<p style="font-size:110%; margin-top:20px; margin-bottom:20px">The UK exported &pound;<span id="SumV"></span> under commodity code <span id="cn_code"></span> - <span id="ProdName"></span>.</p>
-			<p style="font-size:110%; margin-bottom:30px">These sales to non-EU destinations across the world were carried out in <span id="SumC"> </span> shipments from Jul 2016 to Apr 2017.
-			Trades that were worth less than &pound;1 million accounted for &pound;<span id="PercentVSmall"> </span> of this total, carried out in <span id="SumCSmalls"></span> shipments. </p>
-		</div>
-	</div>
 
 
 		<div class="row">
-		
-		<div class="col-md-6 col-sm-6">
-				
-			<table class="table table-striped table-condensed">
-	          <thead>
-	         <tr><td colspan=2><b>Details</b></td></tr>
-			</thead>
-			<tr><td>Value of large exports (&gt; &pound; 320k)</td><td>&pound;<span id="SumVLarges"></span></td></tr>
-			<tr><td>Value of smaller exports (&lt; &pound; 320k)</td><td>&pound;<span id="SumVSmalls"></span></td></tr>
-			<tr><td>No of large exports</td><td><span id="SumCLarges"></span></td></tr>
-			<tr><td>No of small exports</td><td><span id="SumCSmalls2"></span></td></tr>
-		
 
-			<tr><td colspan=2><b>Shipping details</b></td></tr>
-			<tr><td>Number by sea</td><td><span id="SumSea"></span></td></tr>
-			<tr><td>Number by London Heathrow</td><td><span id="SumAirLHR"></span></td></tr>
-			<tr><td>Number by other airports</td><td><span id="SumOtherAir"></span></td></tr>
-			
-			<tr><td colspan=2><b>Customs</b></td></tr>
-			<tr><td>For re-export (&lt; &pound;320k)</td><td><span id="SumReexCSub1m"></span></td></tr>
-			<tr><td>For re-export (&gt; &pound;320k)</td><td><span id="SumReexLarger"></span></td></tr>
-			<tr><td>Inward/outward processing relief &gt; &pound;1m</td><td><span id="SumCIPROPRLarger"></span></td></tr>
-			<tr><td>Not using processing relief </td><td><span id="SumCIPROPRsub1m"></span></td></tr>
-		  
-	                    
-	      
-	       
-	            </table>
+			<div class="col-md-12" id="container">
+				<canvas id="canvas"></canvas>
 				
+				<div id="title" class="title" style="display:none"></div>
+				
+				<div id="access_btn" class="label label-danger"><a title="Further information available on request" style="text-decoration:none; color:white" href='#'>Company info</a></div>
+				
+				<div id="legend" class="legend">
+
+					<p>
+						<i style="color: purple" class="fa fa-circle" aria-hidden="true"></i>
+						Focus trader
+					</p>
+					<p>
+						<i style="color: blue" class="fa fa-circle" aria-hidden="true"></i>
+						Goods exported by them <i style="color: green"
+							class="fa fa-circle" aria-hidden="true"></i> companies who also
+						trade these goods
+					</p>
+					<p>
+						<i style="color: red" class="fa fa-circle" aria-hidden="true"></i>
+						Goods imported by them <i style="color: yellow"
+							class="fa fa-circle" aria-hidden="true"></i> companies who also
+						trade these goods
+					</p>
+
+
+
+
+
+				</div>
+
+				<div id="controls" class="controls">
+
+					<div>
+
+						Goods in common <select id="num_nodes" name="num_nodes">
+							<option value="1">1</option>
+							<option selected="selected" value="2">2</option>
+							<option value="3">3</option>
+						</select>
+
+					</div>
+
+					<div>
+
+						Nodes limit <select id="node_limit" name="node_limit">
+							<option value="10">10</option>
+							<option selected="selected" value="100">100</option>
+							<option value="1000">1,000</option>
+							<option value="10000">10,000</option>
+						</select>
+					</div>
+
+
+					<div>
+						<input type="range" min="0" max="50" value="10" class="slider"
+							id="labelrange"> <span style="float: left">No
+							labels</span> <span style="float: right">More</span>
+					</div>
+
+				</div>
+
+				<div id="keywords">
+
+					<b>Keywords describing the traded goods: </b> <em><span
+						id="CN_words"></span></em>
+						
+					<div class="label label-danger"><a title="Further details on request" style="font-size:10px; text-decoration:none; color:white" href='#'>Bill of lading info</a></div>	
+				
+				</div>
+
 			</div>
-			<div class="col-sm-6 col-md-6">
-				<table id="top_countries" class="table table-striped table-condensed">
-	                <thead>
-	                <tr>
-	                    <td><b>Country</b></td>
-	                    <td><b>Value (&pound;)</b></td>
-	                </tr>
-	                </thead>
-	                
-	                <tbody></tbody>
-	                
-	            </table>
-		
+
+			<div id="tooltip"></div>
+
+
+
+
+
+
+
+		</div>
+
+
+		<div id="trade-stats-placeholder">
+
+
+			<h4 style="color: #999999" class="text-center">Reveal trade
+				statistics by clicking on nodes</h4>
+
+			<div class="text-center trade-stats-explain">
+				Exported goods are <i style="color: blue" class="fa fa-circle"
+					aria-hidden="true"></i> circles and imported goods are <i
+					style="color: red" class="fa fa-circle" aria-hidden="true"></i>
+				circles.
 			</div>
 		</div>
 
-	</div>
-	
-	<div id="trade-stats-imports" style="display:none">
+		<span style="display: none" id="waiting">Please wait ...</span>
 
-	<div class="row">
+		<div id="trade-stats-exports" style="display: none">
 
-	
 
-		<div class="col-md-12">
-			
-			<h3 class="text-center"><b>Import statistics</b></h3>
-			
-			<h4 class="text-center" style="margin-top: 20px; margin-bottom:20px">Import statistics not available</h4> 
-								
-			
+
+			<div class="row">
+
+				<div class="col-md-12">
+
+					<h3 class="text-center">
+						<b>Export statistics</b>
+					</h3>
+
+					<p style="font-size: 110%; margin-top: 20px; margin-bottom: 20px">
+						The UK exported &pound;<span id="SumV"></span> under commodity
+						code <span id="cn_code"></span> - <span id="ProdName"></span>.
+					</p>
+					<p style="font-size: 110%; margin-bottom: 30px">
+						These sales to non-EU destinations across the world were carried
+						out in <span id="SumC"> </span> shipments from Jul 2016 to Apr
+						2017. Trades that were worth less than &pound;1 million accounted
+						for &pound;<span id="PercentVSmall"> </span> of this total,
+						carried out in <span id="SumCSmalls"></span> shipments.
+					</p>
+				</div>
+			</div>
+
+
+			<div class="row">
+
+				<div class="col-md-6 col-sm-6">
+
+					<table class="table table-striped table-condensed">
+						<thead>
+							<tr>
+								<td colspan=2><b>Details</b></td>
+							</tr>
+						</thead>
+						<tr>
+							<td>Value of large exports (&gt; &pound; 320k)</td>
+							<td>&pound;<span id="SumVLarges"></span></td>
+						</tr>
+						<tr>
+							<td>Value of smaller exports (&lt; &pound; 320k)</td>
+							<td>&pound;<span id="SumVSmalls"></span></td>
+						</tr>
+						<tr>
+							<td>No of large exports</td>
+							<td><span id="SumCLarges"></span></td>
+						</tr>
+						<tr>
+							<td>No of small exports</td>
+							<td><span id="SumCSmalls2"></span></td>
+						</tr>
+
+
+						<tr>
+							<td colspan=2><b>Shipping details</b></td>
+						</tr>
+						<tr>
+							<td>Number by sea</td>
+							<td><span id="SumSea"></span></td>
+						</tr>
+						<tr>
+							<td>Number by London Heathrow</td>
+							<td><span id="SumAirLHR"></span></td>
+						</tr>
+						<tr>
+							<td>Number by other airports</td>
+							<td><span id="SumOtherAir"></span></td>
+						</tr>
+
+						<tr>
+							<td colspan=2><b>Customs</b></td>
+						</tr>
+						<tr>
+							<td>For re-export (&lt; &pound;320k)</td>
+							<td><span id="SumReexCSub1m"></span></td>
+						</tr>
+						<tr>
+							<td>For re-export (&gt; &pound;320k)</td>
+							<td><span id="SumReexLarger"></span></td>
+						</tr>
+						<tr>
+							<td>Inward/outward processing relief &gt; &pound;1m</td>
+							<td><span id="SumCIPROPRLarger"></span></td>
+						</tr>
+						<tr>
+							<td>Not using processing relief</td>
+							<td><span id="SumCIPROPRsub1m"></span></td>
+						</tr>
+
+
+
+
+					</table>
+
+				</div>
+				<div class="col-sm-6 col-md-6">
+					<table id="top_countries"
+						class="table table-striped table-condensed">
+						<thead>
+							<tr>
+								<td><b>Country</b></td>
+								<td><b>Value (&pound;)</b></td>
+							</tr>
+						</thead>
+
+						<tbody></tbody>
+
+					</table>
+
+				</div>
+			</div>
+
 		</div>
-	</div>
-</div>
-	
+
+		<div id="trade-stats-imports" style="display: none">
+
+			<div class="row">
+
+
+
+				<div class="col-md-12">
+
+					<h3 class="text-center">
+						<b>Import statistics</b>
+					</h3>
+
+					<h4 class="text-center"
+						style="margin-top: 20px; margin-bottom: 20px">Import
+						statistics not available</h4>
+
+
+				</div>
+			</div>
+		</div>
+
 		<div class="row">
 
-	
 
-		<div class="col-md-12">
-	
-	<p class="text-center">Detailed trade analysis and information is provided through our software at Exabler.com. Customers receive close support 
-			and leading edge technology to carry out various trading activities, from buyer and seller due diligence, pricing, financing to formalities.</p>
-			
-			<p class="text-center" style="margin-top: 30px; margin-bottom:20px"><b>For more information about our products and services, please contact us on 0207 112 8905 or info@exabler.com</b></p>
-	
+
+			<div class="col-md-12">
+
+				<p class="text-center">Detailed trade analysis and information
+					is provided through our software at Exabler.com. Customers receive
+					close support and leading edge technology to carry out various
+					trading activities, from buyer and seller due diligence, pricing,
+					financing to formalities.</p>
+
+				<p>We use machine learning / artificial intelligence tools to offer 
+				additional insights about companies, industries and goods supply chains. 
+			Contact us to enquire.</p>
+
+				<p class="text-center" style="margin-top: 30px; margin-bottom: 20px">
+					<b>For more information about our products and services, please
+						contact us on 0207 112 8905 or info@exabler.com</b>
+				</p>
+
+			</div>
+		</div>
+
 	</div>
-	</div>
-	
-</div>
 
 
 
@@ -506,9 +586,9 @@ $(function() {
 					nodes = graph.nodes;
 			   		links = graph.links;
 				
-			   		   		
 			   		draw(nodes, links);
-			   		$("#CN_words").text(graph.words)
+			   		
+			   		
 				});
 				
 
@@ -552,7 +632,7 @@ function refresh() {
  		links = graph.links;
  		
  		draw(nodes, links);
-		$("#CN_words").text(graph.words)
+		
  		
 	});
 	
@@ -594,12 +674,12 @@ d3.select('button#split').on('mousedown', function(d) {
 		.force('charge', d3.forceManyBody().strength(
 				function(d) { 
 				
-					return d.type === "company" ? -100 : -50; 
+					return d.type === "company" ? -500 : -50; 
 					
 				} 		
 		
 		))
-		 .force("link", d3.forceLink(links).distance(100).strength(5))
+		 .force("link", d3.forceLink(links).distance(50).strength(1.5))
 		.force('xPos', d3.forceX(function(d) { 
 			
 			return d.direction === "Imported" ? width * -0.5 : width * 0.5; 
@@ -662,7 +742,7 @@ d3.select('button#split').on('mousedown', function(d) {
         var query2=$("#num_nodes").val();
         var query3=$("#node_limit").val();	
 		
-        $("#title").text(d.name);
+        
         
         
         d3.json("/graph?q=" + encodeURIComponent(query) + 
@@ -679,7 +759,7 @@ d3.select('button#split').on('mousedown', function(d) {
    			  links = graph.links;
    			  
    			  draw(nodes,links);
-   			  $("#CN_words").text(graph.words)
+   		
    		
    		});
         
@@ -799,7 +879,8 @@ function draw(nodes, links) {
 	 
 	// .alpha(0.5)
 	    .force("charge", d3.forceManyBody().strength(-40))
-	    .force("link", d3.forceLink(links).distance(20).strength(2))
+	    .force("link", d3.forceLink(links).distance(20).strength(1))
+	 	 .force("center", d3.forceCenter())
 	    .force("x", d3.forceX())
 	    .force("y", d3.forceY())
 	    .on("tick", ticked);
@@ -807,9 +888,21 @@ function draw(nodes, links) {
 	// var center_force = d3.forceCenter(width / 2, height / 2);  
 	
 	 canvas = document.querySelector("canvas"),
-	    context = canvas.getContext("2d"),
+	    context = canvas.getContext("2d");
 	//    width = canvas.width,
 	//    height = canvas.height;
+	 
+		
+	var keywords;	
+		
+	keywords = graph.words.join(', ');
+	
+	
+	    $("#CN_words").text(keywords);
+		$("#keywords").fadeIn();
+		$("#access_btn").fadeIn();
+		$("#title").text(focus_company);
+		$("#title").fadeIn();
 	  
 	d3.select(canvas)
 	    .call(d3.drag()
@@ -850,17 +943,22 @@ function draw(nodes, links) {
 	
 		fixed_layout = false;
 		
-		simulation = d3.forceSimulation(nodes)
+		draw(nodes,links);
+		
+//		simulation = d3.forceSimulation(nodes)
+		
 		 
 		// .alpha(0.5)
-		    .force("charge", d3.forceManyBody().strength(-40))
-		    .force("link", d3.forceLink(links).distance(20).strength(2))
-		    .force("x", d3.forceX())
-		    .force("y", d3.forceY())
-		    .on("tick", ticked);
+//		    .force("charge", d3.forceManyBody().strength(-100))
+//		    .force("link", d3.forceLink(links).distance(20).strength(1))
+//		    .force("x", d3.forceX())
+//		    .force("y", d3.forceY())
+//		    .on("tick", ticked);
 	
 				
 	});
+	
+	
 	
 	function ticked() {
 					
